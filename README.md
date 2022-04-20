@@ -16,7 +16,7 @@ Capstone project for DSCI 591+592.
 
 Our team consisted of the following individuals (alphabetized by last name): 
 
-- Tyler Bread, tb3245@drexel.edu
+- Tyler Beard, tb3245@drexel.edu
 - Adam Bennion, ab4657@drexel.edu
 - Zach Carlson, zc378@drexel.edu
 - Andrew Napolitano, asn65@drexel.edu
