@@ -32,6 +32,8 @@ Our team consisted of the following individuals (alphabetized by last name):
 
 ## How to Execute Notebook: 
 
+PreProcess.py expects an "uncropped" directory in the working directory with images to be cropped.
+
 All of the code in this project needs to be opened in a Jupyter notebook environment. We recommend using [Anaconda](https://www.anaconda.com/products/individual).  Additionally, this code can be run in Google Colab or your preferred Python coding environment, assuming folder organization remains unchanged.
 
 ## Known Limitations of Project:
