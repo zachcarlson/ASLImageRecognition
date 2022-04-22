@@ -3,7 +3,7 @@
 import os
 import PIL.Image as Image
 
-def cropImages():
+def CropImages():
     size = 28, 28 #MNIST dataset has the most samples, so match the MNIST dimensions
 
     uncroppedDir = "uncropped/"
@@ -18,7 +18,7 @@ def cropImages():
         print('No images in uncropped directory.')
         return
     for i,infile in enumerate(os.listdir(uncroppedDir)):
-        print(i/numUncropped, '%', end='\r')
+        print(i/numUncropped*100, '%', end='\r')
         outfile = cropDir + infile
         try:
             im = Image.open(uncroppedDir+infile)
@@ -31,4 +31,6 @@ def cropImages():
             print(e,"ERROR - failed to crop '%s'" % infile)
     print("100%")
 
-cropImages()
+def RemoveBackground():
+
+CropImages()
