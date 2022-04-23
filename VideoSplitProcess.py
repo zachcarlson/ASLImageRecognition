@@ -1,15 +1,19 @@
 import cv2
 import os
-current_letter = 'a'
+import sys
+
+current_letter = sys.argv[1]
 
 dir_name = os.path.dirname(__file__)
-print(dir_name)
 
-filename = os.path.join(dir_name, 'Videos', 'A.mp4')
-print(filename)
+filename = os.path.join(dir_name, 'Videos', current_letter + '.mp4')
 
 frame_location = os.path.join(dir_name, 'framed_videos', 'letter_' + current_letter)
-print(frame_location)
+CHECK_FOLDER = os.path.isdir(frame_location)
+
+# If folder doesn't exist, then create it.
+if not CHECK_FOLDER:
+    os.makedirs(frame_location)
 
 capture = cv2.VideoCapture(filename)
 
