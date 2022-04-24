@@ -4,12 +4,13 @@ __pycache__/
 *$py.class
 
 #images
-*.png
-*.PNG
-*.jpg
-*.JPG
-*.jpeg
-*.JPEG
+**/*.jpg
+**/*.png
+**/*.PNG
+**/*.jpg
+**/*.JPG
+**/*.jpeg
+**/*.JPEG
 
 #zip files
 *.zip
