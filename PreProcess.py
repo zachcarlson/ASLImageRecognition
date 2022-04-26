@@ -4,7 +4,7 @@ import os
 import sys
 import PIL.Image as Image
 
-def CropImages(uncroppedDir="", croppedDir="",dimension = (135,240) ):
+def CropImages(uncroppedDir="", croppedDir="",dimension = (135,240)):
 
     if not os.path.exists(uncroppedDir):
         print('No uncropped directory found.')
@@ -21,9 +21,12 @@ def CropImages(uncroppedDir="", croppedDir="",dimension = (135,240) ):
         try:
             im = Image.open(uncroppedDir+infile)
             width, height = im.size
-            min_dim = min(width,height)
-            box_dim = [width/2-min_dim/2, height/2-min_dim/2, width/2+min_dim/2, height/2+min_dim/2]
-            im = im.resize(dimension, Image.ANTIALIAS,box=box_dim)
+            if dimension[0] == dimension[1]:
+                min_dim = min(width,height)
+                box_dim = [width/2-min_dim/2, height/2-min_dim/2, width/2+min_dim/2, height/2+min_dim/2]
+                im = im.resize(dimension, Image.ANTIALIAS,box=box_dim)
+            else:
+                im = im.resize(dimension, Image.ANTIALIAS)
             im.save(outfile, "png")
         except IOError as e:
             print(e,"ERROR - failed to crop '%s'" % infile)
