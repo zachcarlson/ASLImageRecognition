@@ -4,7 +4,7 @@ import os
 import sys
 import PIL.Image as Image
 
-def CropImages(uncroppedDir="", croppedDir="",dimension = 200):
+def CropImages(uncroppedDir="", croppedDir="",dimension = (135,240) ):
 
     if not os.path.exists(uncroppedDir):
         print('No uncropped directory found.')
@@ -29,9 +29,9 @@ def CropImages(uncroppedDir="", croppedDir="",dimension = 200):
             print(e,"ERROR - failed to crop '%s'" % infile)
     print("100%")
 
-def LaunchCrop(subdirectories = True, inpath = "uncropped/",outpath = "cropped/",dimension = 200):
+def LaunchCrop(subdirectories = True, inpath = "uncropped/",outpath = "cropped/", dimensionX = 135, dimensionY = 240):
     print("Cropping...")
-    size = dimension, dimension 
+    size = dimensionX, dimensionY
 
     if subdirectories:
         dirs = os.listdir(inpath)
@@ -44,9 +44,9 @@ def LaunchCrop(subdirectories = True, inpath = "uncropped/",outpath = "cropped/"
 
 args = sys.argv
 if len(args) < 2:
-    LaunchCrop(subdirectories = True, inpath = "uncropped/",outpath = "cropped/",dimension = 200)
-elif len(args) < 5:
-    print("Not enough arguments. Please provide: 1)subdirectories (boolean), 2)inpath (relative to working directory, ending in /), 3)outpath (ending in /), 4)dimension (integer)")
+    LaunchCrop(subdirectories = True, inpath = "uncropped/",outpath = "cropped/", dimensionX = 135, dimensionY = 240)
+elif len(args) < 6:
+    print("Not enough arguments. Please provide: 1)subdirectories (boolean), 2)inpath (relative to working directory, ending in /), 3)outpath (ending in /), 4)dimensionX (integer), 5)dimensionY (integer)") 
 else:
     LaunchCrop(subdirectories = True if args[1]=="True" else False, 
-                inpath = args[2], outpath = args[3], dimension = int(args[4]))
+                inpath = args[2], outpath = args[3], dimensionX = int(args[4]), dimensionY = int(args[5]))
