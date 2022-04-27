@@ -1,4 +1,4 @@
-#reference: https://stackoverflow.com/questions/273946/how-do-i-resize-an-image-using-pil-and-maintain-its-aspect-ratio
+#reference: https://bit.ly/3vku3bt
 
 import os
 import sys
