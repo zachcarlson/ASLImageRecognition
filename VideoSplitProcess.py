@@ -2,34 +2,38 @@ import cv2
 import os
 import sys
 
-current_letter = sys.argv[1]
+letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y']
 
-dir_name = os.path.dirname(__file__)
+for x in letters:
 
-filename = os.path.join(dir_name, 'Videos', current_letter + '.mp4')
+    current_letter = x
 
-frame_location = os.path.join(dir_name, 'framed_videos', 'letter_' + current_letter)
-CHECK_FOLDER = os.path.isdir(frame_location)
+    dir_name = os.path.dirname(__file__)
 
-# If folder doesn't exist, then create it.
-if not CHECK_FOLDER:
-    os.makedirs(frame_location)
+    filename = os.path.join(dir_name, 'Videos', current_letter + '.mp4')
 
-capture = cv2.VideoCapture(filename)
+    frame_location = os.path.join(dir_name, 'framed_videos', 'letter_' + current_letter)
+    CHECK_FOLDER = os.path.isdir(frame_location)
 
-frameNr = 0
+    # If folder doesn't exist, then create it.
+    if not CHECK_FOLDER:
+        os.makedirs(frame_location)
 
-while (True):
+    capture = cv2.VideoCapture(filename)
 
-    success, frame = capture.read()
+    frameNr = 0
 
-    if success:
-        cv2.imwrite(f'{frame_location}/{current_letter}_frame_{frameNr}.jpg', frame)
+    while (True):
 
-    else:
-        break
+        success, frame = capture.read()
 
-    frameNr = frameNr + 1
-    print(frameNr)
+        if success:
+            cv2.imwrite(f'{frame_location}/{current_letter}_frame_{frameNr}.jpg', frame)
 
-capture.release()
+        else:
+            break
+
+        frameNr = frameNr + 1
+        print(frameNr)
+
+    capture.release()
