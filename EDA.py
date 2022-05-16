@@ -16,6 +16,12 @@ def CSV_To_DF(path):
         return None
     return pd.read_csv(path+files[0])
 
+def DF_To_Image(df, image_num):
+    df = df.iloc[:, 1:] #remove labels column
+    image = df.iloc[image_num, :]
+    image = image.to_numpy().reshape(240, 135)
+    return image
+
 def FeatureMeansPerClass(inpath):
     dirs = os.listdir(inpath)
     for d in dirs:
@@ -24,12 +30,19 @@ def FeatureMeansPerClass(inpath):
             print('Error encountered, script terminated.')
             return
         feature_means = df.mean(axis=0,numeric_only=True)
-        fig = plt.figure(num=1, clear=True)
-        ax = fig.add_subplot()
-        ax.plot(range(len(feature_means)),feature_means)
-        ax.set_xlabel('Features')
-        ax.set_ylabel('Mean Value')
-        ax.title.set_text(d+' Class Feature Means')
+        fig, ax = plt.subplots(1, 3, figsize=(15,10))
+        plt.gray()
+        ax[0].imshow(DF_To_Image(df, image_num=1), aspect="auto") #plot first image for each class
+        ax[1].imshow(feature_means.to_numpy().reshape(240, 135), aspect="auto") #plot feature means image
+        ax[2].plot(range(len(feature_means)),feature_means)  #plot feature means
+        
+        #customize appearance
+        ax[2].set_xlabel('Features')
+        ax[2].set_ylabel('Mean Value')
+        ax[0].set_title(d+' Sample Image')
+        ax[1].set_title(d+' Means Image')
+        ax[2].set_title(d+' Class Feature Means')
+        plt.gray() #show images as grayscale
         fig.savefig(d+'_FeatureMeans')  #savefig, don't show
         fig.clear()
         plt.close(fig)
