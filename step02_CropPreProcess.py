@@ -32,7 +32,7 @@ def CropImages(uncroppedDir="", croppedDir="",dimension = (135,240)):
             print(e,"ERROR - failed to crop '%s'" % infile)
     print("100%")
 
-def LaunchCrop(subdirectories = True, inpath = "uncropped/",outpath = "cropped/", dimensionX = 135, dimensionY = 240):
+def LaunchCrop(subdirectories = True, inpath = "uncropped_frames/",outpath = "cropped_frames/", dimensionX = 135, dimensionY = 240):
     print("Cropping...")
     size = dimensionX, dimensionY
 
@@ -47,7 +47,7 @@ def LaunchCrop(subdirectories = True, inpath = "uncropped/",outpath = "cropped/"
 
 args = sys.argv
 if len(args) < 2:
-    LaunchCrop(subdirectories = True, inpath = "uncropped/",outpath = "cropped/", dimensionX = 135, dimensionY = 240)
+    LaunchCrop(subdirectories = True, inpath = "uncropped_frames/",outpath = "cropped_frames/", dimensionX = 135, dimensionY = 240)
 elif len(args) < 6:
     print("Not enough arguments. Please provide: 1)subdirectories (boolean), 2)inpath (relative to working directory, ending in /), 3)outpath (ending in /), 4)dimensionX (integer), 5)dimensionY (integer)") 
 else:
