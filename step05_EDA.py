@@ -59,3 +59,50 @@ else:
     print('not enough arguments')
     print('Try:')
     print('FeatureMeansPerClass')
+
+
+
+# Class Balance Plot
+import os
+import pathlib
+import matplotlib.pyplot as plt
+from collections import OrderedDict
+
+
+#Collect subdir counts into array
+rootdir = "/Users/andrew/PycharmProjects/ASLImageRecognition/gray_frames"
+keys = []
+values = []
+for subdir, dirs, files in os.walk(rootdir):
+    initial_count = 0
+    for path in pathlib.Path(subdir).iterdir():
+        if path.is_file():
+            initial_count += 1
+        subdirClean = os.path.basename(os.path.normpath(subdir))
+        count = initial_count
+    keys.append(subdirClean)
+    values.append(count)
+
+# Convert to Dict
+countDict = {}
+for key, value in zip(keys, values):
+    if key != 'gray_frames':
+        countDict[key] = value
+
+countDict = OrderedDict(sorted(countDict.items()))
+
+print(countDict)
+
+# Visualize
+names = list(countDict.keys())
+values = list(countDict.values())
+mean =  sum(countDict.values()) / len(countDict)
+
+
+plt.bar(range(len(countDict)), values, tick_label=names)
+ax = plt.gca()
+ax.set_ylim([800, 1000])
+plt.xticks(rotation = 45)
+plt.axhline(y=mean, color ='r', linestyle = '-', label = ('Mean Samples: ', int(mean)))
+plt.legend()
+plt.show()
