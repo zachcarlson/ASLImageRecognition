@@ -6,23 +6,28 @@ import PIL.Image as Image
 import numpy as np
 
 #this function assumes an image larger or equal in both width and height compared to dimension parameter value
-def SquareCropStartOfContrast(im, dimension = 224, threshold = 10):
+def SquareCropStartOfContrast(im, dimension = 224, threshold = 60):
     #loop rows until find a pixel with high contrast compared to previous
     #start crop at that row, crop as a square
     im_arr = np.array(im, dtype=np.uint8)
-    prev = im_arr[0][0]
-    border = dimension/20
+    prev = sum(im_arr[0][0])/len(im_arr[0][0])
+    border = dimension/3
     while threshold > 0: #loop until we have found no contrasting pixels, reducing contrast threshold each loop through image
         for r, row in enumerate(im_arr):
+            prev = sum(im_arr[r][0])/len(im_arr[r][0])
             for p, pixel in enumerate(row):
-                if abs(prev - pixel) > threshold:
-                    upper = min(0,r - border)
+                pixel_mean = sum(pixel)/len(pixel)
+                if abs(prev - pixel_mean) > threshold:
+                    print("coordinates:",r,p)
+                    upper = max(0,r - border)
                     if upper > 0 and im_arr.shape[0] < r - border + dimension:   #keep crop on the image
                         upper = im_arr.shape[0]-dimension-1
                     left = 0
                     right = dimension-1 #assuming same image width as dimension
                     lower = upper+dimension
                     return im.crop((left, upper, right, lower))
+                prev = pixel_mean
+        print('.')
         threshold = threshold - 1
     return im
 
@@ -57,7 +62,7 @@ def ResizeImages(uncroppedDir="", croppedDir="",dimension = (224,398), squareCro
             print(e,"ERROR - failed to crop '%s'" % infile)
     print("100%")
 
-def LaunchCrop(subdirectories = True, inpath = "uncropped_frames/",outpath = "cropped_frames/", dimensionX = 224, dimensionY = 398, squareCrop = True):
+def LaunchCrop(subdirectories = True, inpath = "uncropped_frames/",outpath = "cropped_frames/", dimensionX = 224, dimensionY = 398, squareCropStartOfContrast = True):
     print("Cropping...")
     size = dimensionX, dimensionY
 
@@ -65,16 +70,16 @@ def LaunchCrop(subdirectories = True, inpath = "uncropped_frames/",outpath = "cr
         dirs = os.listdir(inpath)
         for d in dirs:
             print("Cropping files in directory:", inpath+d+'/')
-            ResizeImages(inpath+d+'/', outpath+d+'/', size)
+            ResizeImages(inpath+d+'/', outpath+d+'/', size, squareCropStartOfContrast)
     else:
-        ResizeImages(inpath, outpath, size)
+        ResizeImages(inpath, outpath, size, squareCropStartOfContrast)
 
 
 args = sys.argv
 if len(args) < 2:
-    LaunchCrop(subdirectories = True, inpath = "uncropped_frames/",outpath = "cropped_frames/", dimensionX = 224, dimensionY = 398, squareCrop = True)
+    LaunchCrop(subdirectories = True, inpath = "uncropped_frames/",outpath = "cropped_frames/", dimensionX = 224, dimensionY = 398, squareCropStartOfContrast = True)
 elif len(args) < 6:
-    print("Not enough arguments. Please provide: 1)subdirectories (boolean), 2)inpath (relative to working directory, ending in /), 3)outpath (ending in /), 4)dimensionX (integer), 5)dimensionY (integer), 6)square crop boolean") 
+    print("Not enough arguments. Please provide: 1)subdirectories (boolean), 2)inpath (relative to working directory, ending in /), 3)outpath (ending in /), 4)dimensionX (integer), 5)dimensionY (integer), 6)squareCropStartOfContrast boolean") 
 else:
-    LaunchCrop(subdirectories = True if args[1]=="True" else False, 
-                inpath = args[2], outpath = args[3], dimensionX = int(args[4]), dimensionY = int(args[5]))
+    LaunchCrop(subdirectories = (sys.argv[1].lower() == 'true'), 
+                inpath = args[2], outpath = args[3], dimensionX = int(args[4]), dimensionY = int(args[5]),squareCropStartOfContrast=(sys.argv[6].lower() == 'true'))
