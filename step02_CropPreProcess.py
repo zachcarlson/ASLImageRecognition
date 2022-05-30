@@ -11,20 +11,20 @@ def SquareCropStartOfContrast(im, dimension = 224, threshold = 60):
     #start crop at that row, crop as a square
     im_arr = np.array(im, dtype=np.uint8)
     prev = sum(im_arr[0][0])/len(im_arr[0][0])
-    border = dimension/3
+    borderY = dimension/3
+    borderX = dimension/2
     while threshold > 0: #loop until we have found no contrasting pixels, reducing contrast threshold each loop through image
         for r, row in enumerate(im_arr):
             prev = sum(im_arr[r][0])/len(im_arr[r][0])
             for p, pixel in enumerate(row):
                 pixel_mean = sum(pixel)/len(pixel)
                 if abs(prev - pixel_mean) > threshold:
-                    print("coordinates:",r,p)
-                    upper = max(0,r - border)
-                    if upper > 0 and im_arr.shape[0] < r - border + dimension:   #keep crop on the image
-                        upper = im_arr.shape[0]-dimension-1
-                    left = 0
-                    right = dimension-1 #assuming same image width as dimension
+                    upper = max(0,r - borderY)
+                    upper = min(upper,im_arr.shape[0]-dimension)
                     lower = upper+dimension
+                    left = max(0,p - borderX)
+                    left = min(left,im_arr.shape[1]-dimension)
+                    right = left+dimension #assuming same image width as dimension
                     return im.crop((left, upper, right, lower))
                 prev = pixel_mean
         print('.')
