@@ -11,7 +11,10 @@ Our project focused on American Sign Language (ASL).  The goal of this project w
 - `Folder /data` - Contains all small data files
   - `letter_means_df.csv` - Mean pixel values for each letter
 - `Folder /documents` - Contains all reports as required for class
+  - `DSCI 591 Data Acquisition and Pre-Processing Report.pdf` - PDF of first report for class.
+  - `DSCI 591 Exploratory Data Analytics Report.docx` - Second report for class.
   - `Pitch.pptx` - Slides for first presentation in class
+  - `Status Report.ppx` - Slides for second presentation in class
 - `ASLImageRecognition.ipynb` - Jupyter Notebook used for some EDA visualizations
 - `step01_VideoSplitPreProcess.py` - Python script to split raw video footage into series of frames
 - `step02_CropPreProcess.py` - Python script to center and crop images 
