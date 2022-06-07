@@ -18,7 +18,7 @@ Our project focused on American Sign Language (ASL).  The goal of this project w
   - `Status Report.ppx` - Slides for second presentation in class
 - `Folder /images` - Contains all relevant figures created for the project
   - `Folder /FeatureMeansSummary` - Contains all summary figures for each letter
-  - StandardDeviationOfAllClasses.png` - Composite image of standard deviations of each pixel mean value across each letter.  (See `ASLImageRecognition.ipynb` for more information.)
+  - `StandardDeviationOfAllClasses.png` - Composite image of standard deviations of each pixel mean value across each letter.  (See `ASLImageRecognition.ipynb` for more information.)
 - `ASLImageRecognition.ipynb` - Jupyter Notebook used for some EDA visualizations
 - `step01_VideoSplitPreProcess.py` - Python script to split raw video footage into series of frames
 - `step02_CropPreProcess.py` - Python script to center and crop images 
