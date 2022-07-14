@@ -1,4 +1,6 @@
 import numpy as np
+from sklearn.neighbors import KNeighborsClassifier
+
 process = 'Apply label to samples'
 csv_files_path = "CSV_Files/"
 
@@ -21,14 +23,38 @@ def ApplyLabelToSamples(csvDir="",classStartAt=0):
         classNum += 1
 
     print("100%")
-    return samples
+    return samples[:,0:-1], samples[:,-1]
 
+def DimensionReduce():
+    #PCA?
+    #LDA?
+    #simple down rez?
+    #return newly reduced data
+def KNN(X, Y, num_neighbors = 3):
+    # 
+    #
+    neigh = KNeighborsClassifier(n_neighbors=num_neighbors)
+    neigh.fit(X, y)
+    print(neigh.predict([[1.1]]))
 
 args = sys.argv
-if len(args) < 2:
-    ApplyLabelToSamples()
-elif len(args) < 3:
-    print(
-        "Not enough arguments. Please provide: 1)inpath (relative to working directory, ending in /)")
-else:
-    ApplyLabelToSamples(inpath=args[1])
+
+if len(args) < 3:
+    print("Not enough arguments.")
+    print("Please provide:")
+    print("1) model  ---- (KNN, ...)")
+    print("2) inpath ---- (relative to working directory, ending in /)")
+elif len(args) > 3:
+    print("Too many arguments.")
+    print("Please provide:")
+    print("1) model  ---- (KNN, ...)")
+    print("2) inpath ---- (relative to working directory, ending in /)")
+else if args[1] == "KNN":
+    samples, labels = ApplyLabelToSamples()
+    #70% train. Stratify keeps class distribution balanced
+    X_train, X_test, y_train, y_test = train_test_split(samples, labels, test_size=.3, random_state=42, stratify=labels) 
+    #20% validation, 10% test. Stratify keeps class distribution balanced
+    X_validate, X_test, y_validate, y_test = train_test_split(X_test, y_test, test_size=.33, random_state=42, stratify=y_test) 
+    samples = DimensionReduce(samples)
+    KNN(samples, labels, num_neighbors = 10)
+    ApplyLabelToSamples(inpath=args[2])
