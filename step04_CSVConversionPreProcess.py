@@ -5,7 +5,7 @@ import numpy as np
 import csv
 
 
-def ConvertImagesToCSV(imageDir="", csvDir=""):
+def ConvertImagesToCSV(imageDir="", csvDir="",label=0):
     if not os.path.exists(imageDir):
         print('No image directory found.')
         return
@@ -15,7 +15,6 @@ def ConvertImagesToCSV(imageDir="", csvDir=""):
     if numImg < 1:
         print('No images in cropped_frames (i.e. RBG image) directory.')
         return
-
     for i, infile in enumerate(os.listdir(imageDir)):
 
         try:
@@ -23,19 +22,15 @@ def ConvertImagesToCSV(imageDir="", csvDir=""):
 
             #get the letter
             letter = infile[0]
-            print(letter)
 
             value = np.asarray(img_file.getdata(), dtype=int).reshape((img_file.size[1], img_file.size[0]))
             value = value.flatten()
-            value = np.concatenate([[letter], value])
-            print(value)
+            value = np.concatenate([[label], value])
             with open(csvDir + letter + "_img_pixels.csv", 'a') as f:
                 writer = csv.writer(f)
                 writer.writerow(value)
         except IOError as e:
             print(e, "ERROR - failed to convert '%s'" % infile)
-
-    print("100%")
 
 
 def LaunchConvert(subdirectories=True, inpath="gray_frames/", outpath="CSV_Files/"):
@@ -43,9 +38,9 @@ def LaunchConvert(subdirectories=True, inpath="gray_frames/", outpath="CSV_Files
 
     if subdirectories:
         dirs = os.listdir(inpath)
-        for d in dirs:
+        for i,d in enumerate(dirs):
             print("Converting image files in directory:", inpath + d + '/')
-            ConvertImagesToCSV(inpath + d + '/', outpath + d + '/')
+            ConvertImagesToCSV(inpath + d + '/', outpath + d + '/',label=i)
     else:
         ConvertImagesToCSV(inpath, outpath)
 
