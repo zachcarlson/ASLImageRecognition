@@ -53,6 +53,8 @@ def KNN(X, Y, num_neighbors = 3):
 
 args = sys.argv
 
+saveNames=["X_train_reduced.npy","y_train.npy","X_validation.npy","y_validation.npy","X_test.npy","y_test.npy"]
+
 if len(args) == 3 and args[1] == 'DimReduce' and args[2] == 'True' or args[2] == "False":
     samples, labels = LoadSamples(csvDir = csv_files_path, classStartAt = 0)
     #70% train. Stratify keeps class distribution balanced
@@ -63,12 +65,12 @@ if len(args) == 3 and args[1] == 'DimReduce' and args[2] == 'True' or args[2] ==
     #dimension reduction
     X_train_reduced = DimensionReduce(X_train, y_train)
     saveReducedData = True if args[2] == "True" else False
-    saveNames=["X_train_reduced.csv","y_train.csv","X_validation.csv","y_validation.csv","X_test.csv","y_test.csv"]
     data = [X_train, y_train, X_validate, y_validate, X_test, y_test]
     if saveReducedData:
         for i in range(len(saveNames)):
-            print("Saving",saveName[i],"...")
-            np.savetxt(saveName[i],data[i],delimiter=",")
+            print("Saving",saveNames[i],"...")
+            with open(saveNames[i], 'wb') as f:
+                np.save(f, data[i])
 
 elif len(args) < 3:
     print("Please provide:")
@@ -80,4 +82,8 @@ elif len(args) > 3:
     print("1) model  ---- (KNN, ...)")
     print("2) inpath ---- (relative to working directory, ending in /)")
 elif args[1] == "KNN":
+    data = [X_train,  y_train, X_validate, y_validate, X_test, y_test] = (None,None,None,None,None,None)
+    for i, saveName in enumerate(saveNames):
+        with open(saveName, 'rb') as f:
+            data[i] = np.load(f)
     KNN(samples, labels, num_neighbors = 10)
