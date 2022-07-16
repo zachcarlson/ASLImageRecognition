@@ -5,8 +5,11 @@ __pycache__/
 
 #CSV
 /CSV_Files
-**.*.CSV
-**.*.csv
+**/*.CSV
+**/*.csv
+
+#numpy files
+**/*.npy
 
 #images
 **/*.jpg

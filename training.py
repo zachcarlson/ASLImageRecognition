@@ -44,18 +44,26 @@ def DimensionReduce(X_data,y_data):
     print("Finished dimension reduction!")
     return X_reduced
 
-def KNN(X, Y, num_neighbors = 3):
-    # 
-    #
+def KNN(data, num_neighbors = 3):
+    #split data
+    X_train,  y_train, X_validate, y_validate, X_test, y_test = data
     neigh = KNeighborsClassifier(n_neighbors=num_neighbors)
-    neigh.fit(X, y)
-    print(neigh.predict([[1.1]]))
+    neigh.fit(X_train, y_train)
+    val_score = neigh.score(X_validate,y_validate)
+    print("Validation score:",val_score)
 
 args = sys.argv
 
 saveNames=["X_train_reduced.npy","y_train.npy","X_validation.npy","y_validation.npy","X_test.npy","y_test.npy"]
 
-if len(args) == 3 and args[1] == 'DimReduce' and args[2] == 'True' or args[2] == "False":
+
+if len(args) == 2 and args[1] == "KNN":
+    data = [X_train,  y_train, X_validate, y_validate, X_test, y_test] = [None,None,None,None,None,None]
+    for i, saveName in enumerate(saveNames):
+        with open(saveName, 'rb') as f:
+            data[i] = np.load(f)
+    KNN(data, num_neighbors = 10)
+elif len(args) == 3 and args[1] == 'DimReduce' and (args[2] == 'True' or args[2] == "False"):
     samples, labels = LoadSamples(csvDir = csv_files_path, classStartAt = 0)
     #70% train. Stratify keeps class distribution balanced
     X_train, X_test, y_train, y_test = train_test_split(samples, labels, test_size=.3, random_state=42, stratify=labels) 
@@ -71,19 +79,10 @@ if len(args) == 3 and args[1] == 'DimReduce' and args[2] == 'True' or args[2] ==
             print("Saving",saveNames[i],"...")
             with open(saveNames[i], 'wb') as f:
                 np.save(f, data[i])
-
-elif len(args) < 3:
-    print("Please provide:")
-    print("1) model  ---- (KNN, ...)")
-    print("2) inpath ---- (relative to working directory, ending in /)")
 elif len(args) > 3:
     print("Too many arguments.")
     print("Please provide:")
     print("1) model  ---- (KNN, ...)")
     print("2) inpath ---- (relative to working directory, ending in /)")
-elif args[1] == "KNN":
-    data = [X_train,  y_train, X_validate, y_validate, X_test, y_test] = (None,None,None,None,None,None)
-    for i, saveName in enumerate(saveNames):
-        with open(saveName, 'rb') as f:
-            data[i] = np.load(f)
-    KNN(samples, labels, num_neighbors = 10)
+else:
+    print("Invalid arguments. Please view training.py for argument options.")
