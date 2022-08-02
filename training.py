@@ -8,6 +8,13 @@ import sys
 from sklearn.decomposition import PCA
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
+import keras
+from keras.models import Sequential
+from keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, Dropout
+from keras.optimizers import Adam
+from keras.callbacks import TensorBoard
+
+
 import seaborn as sns
 process = 'Apply label to samples'
 csv_files_path = "CSV_Files/"
@@ -66,6 +73,35 @@ def KNN(data, num_neighbors = 3):
     cm = confusion_matrix(y_true, y_pred, labels=labels)
     plot_confusion_matrix(cm, classes=letters)
 
+def CNN(data, epochs=3, kernel_size=3, dropout=.25):
+    X_train, y_train,X_validate, y_validate, X_test, y_test = data
+
+    #reshape the dim reduced array to fit the CNN
+    X_train = X_train.reshape(X_train.shape[0], 224, 224, 1)
+    X_validate = X_validate.reshape(X_validate.shape[0],224,224,1)
+    y_train = keras.utils.to_categorical(y_train, 24)
+    y_validate = keras.utils.to_categorical(y_validate, 24)
+
+
+    print("Defining CNN")
+    # Defining the Convolutional Neural Network
+
+    cnn_model = Sequential()
+    cnn_model.add(Conv2D(64, (3, 3), input_shape=(224, 224, 1), activation='relu'))
+    cnn_model.add(MaxPooling2D(pool_size=(2, 2)))
+    cnn_model.add(Dropout(dropout))
+    cnn_model.add(Conv2D(32, kernel_size=kernel_size, activation='relu'))
+    cnn_model.add(MaxPooling2D(pool_size=(2, 2)))
+    cnn_model.add(Dropout(dropout))
+    cnn_model.add(Flatten())
+    cnn_model.add(Dense(24, activation='softmax'))
+
+    print("Compiling CNN")
+    cnn_model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+
+    print("Training CNN")
+    cnn_model.fit(X_train, y_train, validation_data=(X_validate, y_validate), epochs=epochs)
+
 def plot_confusion_matrix(cm, classes,
                           normalize=False,
                           title='Confusion matrix',
@@ -112,6 +148,17 @@ if len(args) == 2 and args[0] == "KNN":
             data[i] = np.load(f)
     print('starting KNN')
     KNN(data, num_neighbors=10)
+
+if len(args) == 2 and args[0] == "CNN":
+    data = [X_train, y_train, X_validate, y_validate, X_test, y_test] = [None, None, None, None, None, None]
+    print('Looking for data')
+
+
+    for i, saveName in enumerate(saveNames):
+        with open(args[1] + saveName, 'rb') as f:
+            data[i] = np.load(f)
+    print('starting CNN')
+    CNN(data)
 
 elif len(args) == 2 and args[0] == 'DimReduce' and (args[1] == 'True' or args[1] == "False"):
     samples, labels = LoadSamples(csvDir=csv_files_path, classStartAt=0)
