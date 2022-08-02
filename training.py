@@ -1,5 +1,7 @@
 import itertools
 import os
+
+import matplotlib
 import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.random_projection import johnson_lindenstrauss_min_dim
@@ -56,7 +58,7 @@ def DimensionReduce(X_data,y_data):
     print("Finished dimension reduction!")
     return X_reduced
 
-def KNN(data, num_neighbors = 3):
+def KNN(data, num_neighbors = 3, havePlotUI=True):
     #split data
     X_train,  y_train, X_validate, y_validate, X_test, y_test = data
     neigh = KNeighborsClassifier(n_neighbors=num_neighbors)
@@ -67,11 +69,11 @@ def KNN(data, num_neighbors = 3):
     y_pred = neigh.predict(X_test)
     y_true = y_test
     #print(len(letters))
-    print("Classification Report:")
+    print("Test Classification Report:")
     print(classification_report(y_true, y_pred, target_names=letters, labels=labels))
 
     cm = confusion_matrix(y_true, y_pred, labels=labels)
-    plot_confusion_matrix(cm, classes=letters)
+    plot_confusion_matrix(cm, hyperparameter = "num_neighbors "+str(n), classes=letters,haveUI=havePlotUI)
 
 def CNN(data, epochs=3, kernel_size=3, dropout=.25):
     X_train, y_train,X_validate, y_validate, X_test, y_test = data
@@ -102,10 +104,11 @@ def CNN(data, epochs=3, kernel_size=3, dropout=.25):
     print("Training CNN")
     cnn_model.fit(X_train, y_train, validation_data=(X_validate, y_validate), epochs=epochs)
 
-def plot_confusion_matrix(cm, classes,
+
+def plot_confusion_matrix(cm, classes, hyperparameter,
                           normalize=False,
                           title='Confusion matrix',
-                          cmap=plt.cm.Blues):
+                          cmap=plt.cm.Blues, haveUI=True):
 
     plt.imshow(cm, interpolation='nearest', cmap=cmap)
     plt.title(title)
@@ -129,7 +132,12 @@ def plot_confusion_matrix(cm, classes,
     plt.tight_layout()
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
-    plt.show()
+    if haveUI:
+        plt.show()
+    else:
+        plt.savefig("KNN "+hyperparameter)  #savefig, don't show
+    plt.figure().clear()
+    plt.close()
 
 
 
@@ -140,14 +148,15 @@ saveNames=["X_train_reduced.npy","y_train.npy","X_validation.npy","y_validation.
 if('training.py' in args[0]):
     args = args[1:]
 
-if len(args) == 2 and args[0] == "KNN":
+if len(args) == 1 and args[0] == "KNN":
     data = [X_train, y_train, X_validate, y_validate, X_test, y_test] = [None, None, None, None, None, None]
     print('Looking for data')
     for i, saveName in enumerate(saveNames):
-        with open(args[1] + saveName, 'rb') as f:
+        with open(saveName, 'rb') as f:
             data[i] = np.load(f)
-    print('starting KNN')
-    KNN(data, num_neighbors=10)
+    n = 10
+    print('starting KNN with',n,"neighbors...")
+    KNN(data, num_neighbors=n)
 
 if len(args) == 2 and args[0] == "CNN":
     data = [X_train, y_train, X_validate, y_validate, X_test, y_test] = [None, None, None, None, None, None]
@@ -159,6 +168,31 @@ if len(args) == 2 and args[0] == "CNN":
             data[i] = np.load(f)
     print('starting CNN')
     CNN(data)
+
+elif len(args) == 2 and args[0] == "KNN" and args[1] == "NoPlotUI":
+    matplotlib.use('Agg') # no UI backend
+    data = [X_train, y_train, X_validate, y_validate, X_test, y_test] = [None, None, None, None, None, None]
+    print('Looking for data')
+    for i, saveName in enumerate(saveNames):
+        with open(saveName, 'rb') as f:
+            data[i] = np.load(f)
+    n = 10
+    print('starting KNN with',n,"neighbors...")
+    KNN(data, num_neighbors=n, havePlotUI=False)
+elif len(args) > 3 and args[0] == "KNN" and args[1] == "HyperTweak" and args[2] == "NoPlotUI":
+    matplotlib.use('Agg') # no UI backend
+    n_neighbors_list = [int(n) for n in args[3:]]
+    data = [X_train, y_train, X_validate, y_validate, X_test, y_test] = [None, None, None, None, None, None]
+    print('Looking for data')
+    for i, saveName in enumerate(saveNames):
+        with open(saveName, 'rb') as f:
+            data[i] = np.load(f)
+    print("Running KNN hyperparameter tweaking loop...")
+    for n in n_neighbors_list:
+        print('starting KNN with',n,"neighbors...")
+        KNN(data, num_neighbors=n, havePlotUI=False)
+
+
 
 elif len(args) == 2 and args[0] == 'DimReduce' and (args[1] == 'True' or args[1] == "False"):
     samples, labels = LoadSamples(csvDir=csv_files_path, classStartAt=0)
@@ -178,10 +212,5 @@ elif len(args) == 2 and args[0] == 'DimReduce' and (args[1] == 'True' or args[1]
             print("Saving", saveNames[i], "...")
             with open(saveNames[i], 'wb') as f:
                 np.save(f, data[i])
-elif len(args) > 3:
-    print("Too many arguments.")
-    print("Please provide:")
-    print("1) model  ---- (KNN, ...)")
-    print("2) inpath ---- (relative to working directory, ending in /)")
 else:
     print("Invalid arguments. Please view training.py for argument options.")
