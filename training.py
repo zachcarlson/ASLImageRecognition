@@ -1,3 +1,42 @@
+#################################################
+# readme
+#
+### npy files ####
+# npy files are the ideal data format for readin gin data when running prediction models
+# this is due to their binary format (FAR more efficient - much faster loading times)
+#
+###### KNN ######
+# KNN needs dimension reduced data in order to avoid overfitting and have shorter processing time
+# To generate the necessary npy files, run the following in command line:
+#
+# /bin/python3 training.py DimReduce
+#
+# Exact python argument syntax may vary per setup. This will output all necessary npy files to your execution directory.
+#
+# To execute KNN run the following from command line:
+#
+# /bin/python3 training.py KNN HyperTweak NoPlotUI 3 5 10 15 20 30 40 50
+#
+# The numbers to the far right each represent a different number of neighbors to consider in the KNN model.
+# In otherwords, they reach represent a hyperparameter value in the hyperparameter tweak loop.
+# 'HyperTweak' Means KNN will run a loop of varying number of neighbors as defined in the right-most arguments
+# You do not need 'NoPlotUI' unless you are running WSL (Windows Subsystem for Linux).
+#
+###### CNN ######
+#
+# CNN does NOT need dimension reduced data but npy files are still the ideal input format.
+# To generate the necessary npy files, run the following in command line:
+#
+# /bin/python3 training.py csvToNpy
+#
+# This will output all necessary npy files to your execution directory.
+# 
+# To execute CNN run the following from command line:
+#
+# /bin/python3 training.py CNN
+#
+#################################################
+
 import itertools
 import os
 
@@ -44,19 +83,38 @@ def LoadSamples(csvDir="",classStartAt=0):
     print("Number of bytes:",samples.nbytes)
     return samples[:,1:], np.ravel(samples[:,:1])
 
-def DimensionReduce(X_data,y_data):
+def DimensionReduce(X_train, y_train, X_validate, X_test):
     #johnson lindenstrauss lemma computation for ideal minimum number of dimensions
     epsilon = .15 #permitted error %
     min_dim = johnson_lindenstrauss_min_dim(22344, eps=epsilon)
     # 5% error needs 33150 dimensions retained
     # 10% error = 8583, 15% = 3936, 35% = 853
     print('Minimum dimensions to retain',epsilon,'error:',min_dim)
-    #LDA -- aims to model based off difference between classes... supervised dimension reduction (DR) will likely outperform unsupervised DR such as PCA.
     pca = PCA(n_components = min_dim)
     print("Beginning dimension reduction...")
-    X_reduced = pca.fit_transform(X_data, y_data)
+    X_train_reduced = pca.fit_transform(X_train, y_train)
+    X_validate_reduced = pca.transform(X_validate)
+    X_test_reduced = pca.transform(X_test)
     print("Finished dimension reduction!")
-    return X_reduced
+    return X_train_reduced, X_validate_reduced, X_test_reduced
+
+def ConvertToNpy(saveNames, reduce = False):
+    samples, labels = LoadSamples(csvDir=csv_files_path, classStartAt=0)
+    # 70% train. Stratify keeps class distribution balanced
+    X_train, X_test, y_train, y_test = train_test_split(samples, labels, test_size=.3, random_state=42,
+                                                        stratify=labels)
+    # 20% validation, 10% test
+    X_validate, X_test, y_validate, y_test = train_test_split(X_test, y_test, test_size=.33, random_state=42,
+                                                              stratify=y_test)
+    # dimension reduction
+    if reduce:
+        X_train, X_validate, X_test = DimensionReduce(X_train, y_train, X_validate, X_test)
+
+    data = [X_train, y_train, X_validate, y_validate, X_test, y_test]
+    for i in range(len(saveNames)):
+        print("Saving", saveNames[i], "...")
+        with open(saveNames[i], 'wb') as f:
+            np.save(f, data[i])
 
 def KNN(data, num_neighbors = 3, havePlotUI=True):
     #split data
@@ -140,10 +198,10 @@ def plot_confusion_matrix(cm, classes, hyperparameter,
     plt.close()
 
 
-
 args = sys.argv
 
-saveNames=["X_train_reduced.npy","y_train.npy","X_validation.npy","y_validation.npy","X_test.npy","y_test.npy"]
+saveNamesKNN=["X_train_reduced.npy","y_train_reduced.npy","X_validation_reduced.npy","y_validation_reduced.npy","X_test_reduced.npy","y_test_reduced.npy"]
+saveNamesCNN=["X_train.npy","y_train.npy","X_validation.npy","y_validation.npy","X_test.npy","y_test.npy"]
 
 if('training.py' in args[0]):
     args = args[1:]
@@ -151,7 +209,7 @@ if('training.py' in args[0]):
 if len(args) == 1 and args[0] == "KNN":
     data = [X_train, y_train, X_validate, y_validate, X_test, y_test] = [None, None, None, None, None, None]
     print('Looking for data')
-    for i, saveName in enumerate(saveNames):
+    for i, saveName in enumerate(saveNamesKNN):
         with open(saveName, 'rb') as f:
             data[i] = np.load(f)
     n = 10
@@ -163,7 +221,7 @@ if len(args) == 2 and args[0] == "CNN":
     print('Looking for data')
 
 
-    for i, saveName in enumerate(saveNames):
+    for i, saveName in enumerate(saveNamesCNN):
         with open(args[1] + saveName, 'rb') as f:
             data[i] = np.load(f)
     print('starting CNN')
@@ -173,7 +231,7 @@ elif len(args) == 2 and args[0] == "KNN" and args[1] == "NoPlotUI":
     matplotlib.use('Agg') # no UI backend
     data = [X_train, y_train, X_validate, y_validate, X_test, y_test] = [None, None, None, None, None, None]
     print('Looking for data')
-    for i, saveName in enumerate(saveNames):
+    for i, saveName in enumerate(saveNamesKNN):
         with open(saveName, 'rb') as f:
             data[i] = np.load(f)
     n = 10
@@ -184,33 +242,18 @@ elif len(args) > 3 and args[0] == "KNN" and args[1] == "HyperTweak" and args[2] 
     n_neighbors_list = [int(n) for n in args[3:]]
     data = [X_train, y_train, X_validate, y_validate, X_test, y_test] = [None, None, None, None, None, None]
     print('Looking for data')
-    for i, saveName in enumerate(saveNames):
+    for i, saveName in enumerate(saveNamesKNN):
         with open(saveName, 'rb') as f:
             data[i] = np.load(f)
     print("Running KNN hyperparameter tweaking loop...")
     for n in n_neighbors_list:
         print('starting KNN with',n,"neighbors...")
-        KNN(data, num_neighbors=n, havePlotUI=False)
+        KNN(data, saveNamesKNN, num_neighbors=n, havePlotUI=False)
 
+elif len(args) == 1 and args[0] == 'csvToNpy':
+        ConvertToNpy(saveNamesCNN)
 
-
-elif len(args) == 2 and args[0] == 'DimReduce' and (args[1] == 'True' or args[1] == "False"):
-    samples, labels = LoadSamples(csvDir=csv_files_path, classStartAt=0)
-    # 70% train. Stratify keeps class distribution balanced
-    X_train, X_test, y_train, y_test = train_test_split(samples, labels, test_size=.3, random_state=42,
-                                                        stratify=labels)
-    # 20% validation, 10% test
-    X_validate, X_test, y_validate, y_test = train_test_split(X_test, y_test, test_size=.33, random_state=42,
-                                                              stratify=y_test)
-
-    # dimension reduction
-    X_train_reduced = DimensionReduce(X_train, y_train)
-    saveReducedData = True if args[1] == "True" else False
-    data = [X_train, y_train, X_validate, y_validate, X_test, y_test]
-    if saveReducedData:
-        for i in range(len(saveNames)):
-            print("Saving", saveNames[i], "...")
-            with open(saveNames[i], 'wb') as f:
-                np.save(f, data[i])
+elif len(args) == 1 and args[0] == 'DimReduce':
+        ConvertToNpy(saveNamesKNN,reduce=True)
 else:
     print("Invalid arguments. Please view training.py for argument options.")
