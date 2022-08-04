@@ -132,7 +132,7 @@ def KNN(data, num_neighbors = 3, havePlotUI=True):
     cm = confusion_matrix(y_true, y_pred, labels=labels)
     plot_confusion_matrix(cm, hyperparameter="num_neighbors "+str(n), classes=letters, haveUI=havePlotUI)
 
-def CNN(data, epochs=3, kernel_size=3, dropout=.25):
+def CNN(data, epochs=5, kernel_size=3, dropout=.25):
     X_train, y_train,X_validate, y_validate, X_test, y_test = data
 
     #reshape the dim reduced array to fit the CNN
