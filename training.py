@@ -53,6 +53,8 @@ from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, Dropout
 from keras.optimizers import Adam
 from keras.callbacks import TensorBoard
+from keras.callbacks import EarlyStopping
+from sklearn.metrics import accuracy_score
 
 
 import seaborn as sns
@@ -135,13 +137,12 @@ def KNN(data, num_neighbors = 3, havePlotUI=True):
 def CNN(data, epochs=10, kernel_size=[5,3], dropout=.20, strides=[5,3]):
     X_train, y_train,X_validate, y_validate, X_test, y_test = data
 
-    #reshape the dim reduced array to fit the CNN
+    #reshape the array to fit the CNN
     X_train = X_train.reshape(X_train.shape[0], 224, 224, 1)
     X_validate = X_validate.reshape(X_validate.shape[0],224,224,1)
     y_train = keras.utils.to_categorical(y_train, 24)
     y_validate = keras.utils.to_categorical(y_validate, 24)
-
-
+    X_test = X_test.reshape(X_test.shape[0], 224, 224, 1)
 
     # Defining the Convolutional Neural Network
 
@@ -160,7 +161,10 @@ def CNN(data, epochs=10, kernel_size=[5,3], dropout=.20, strides=[5,3]):
     cnn_model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
     print("Training CNN")
-    cnn_model.fit(X_train, y_train, validation_data=(X_validate, y_validate), epochs=epochs)
+    callback = EarlyStopping(monitor='loss', min_delta=0.01, patience=3)
+    cnn_model.fit(X_train, y_train, validation_data=(X_validate, y_validate), epochs=epochs, callbacks=[callback])
+    test_predictions = cnn_model.predict(X_test)
+    print('Test Accuracy:',accuracy_score(y_test, np.argmax(test_predictions, axis=1)))
 
 
 def plot_confusion_matrix(cm, classes, hyperparameter,
@@ -215,14 +219,31 @@ if len(args) == 1 and args[0] == "KNN":
     n = 10
     print('starting KNN with',n,"neighbors...")
     KNN(data, num_neighbors=n)
-
-if len(args) == 2 and args[0] == "CNN":
+if len(args) == 2 and args[0] == "CNN" and args[1] == "HPLoop":
     data = [X_train, y_train, X_validate, y_validate, X_test, y_test] = [None, None, None, None, None, None]
     print('Looking for data')
-
-
+    for i, saveName in enumerate(saveNamesCNN):
+        with open(saveName, 'rb') as f:
+            data[i] = np.load(f)
+    print('starting CNN')
+    dropouts = [.2,.25,.3]
+    kernel_sizes = [[5,3],[4,4],[5,5]]
+    for d in dropouts:
+        for ks in kernel_sizes:
+            CNN(data,epochs=10, kernel_size=ks, dropout=d)
+elif len(args) == 2 and args[0] == "CNN":
+    data = [X_train, y_train, X_validate, y_validate, X_test, y_test] = [None, None, None, None, None, None]
+    print('Looking for data')
     for i, saveName in enumerate(saveNamesCNN):
         with open(args[1] + saveName, 'rb') as f:
+            data[i] = np.load(f)
+    print('starting CNN')
+    CNN(data)
+elif len(args) == 1 and args[0] == "CNN":
+    data = [X_train, y_train, X_validate, y_validate, X_test, y_test] = [None, None, None, None, None, None]
+    print('Looking for data')
+    for i, saveName in enumerate(saveNamesCNN):
+        with open(saveName, 'rb') as f:
             data[i] = np.load(f)
     print('starting CNN')
     CNN(data)
@@ -257,3 +278,4 @@ elif len(args) == 1 and args[0] == 'DimReduce':
         ConvertToNpy(saveNamesKNN,reduce=True)
 else:
     print("Invalid arguments. Please view training.py for argument options.")
+    print('Your arguments:',args)
