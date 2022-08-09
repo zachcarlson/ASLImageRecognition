@@ -132,7 +132,7 @@ def KNN(data, num_neighbors = 3, havePlotUI=True):
     cm = confusion_matrix(y_true, y_pred, labels=labels)
     plot_confusion_matrix(cm, hyperparameter="num_neighbors "+str(n), classes=letters, haveUI=havePlotUI)
 
-def CNN(data, epochs=7, kernel_size=[5,3], dropout=.20):
+def CNN(data, epochs=10, kernel_size=[5,3], dropout=.20, strides=[5,3]):
     X_train, y_train,X_validate, y_validate, X_test, y_test = data
 
     #reshape the dim reduced array to fit the CNN
@@ -146,16 +146,16 @@ def CNN(data, epochs=7, kernel_size=[5,3], dropout=.20):
     # Defining the Convolutional Neural Network
 
     cnn_model = Sequential()
-    cnn_model.add(Conv2D(64, kernel_size=kernel_size[0], strides=(3, 3), input_shape=(224, 224, 1), activation='relu'))
+    cnn_model.add(Conv2D(64, kernel_size=kernel_size[0], strides=(strides[0], strides[0]), input_shape=(224, 224, 1), activation='relu'))
     cnn_model.add(MaxPooling2D(pool_size=(2, 2)))
     cnn_model.add(Dropout(dropout))
-    cnn_model.add(Conv2D(32, kernel_size=kernel_size[1], activation='relu'))
+    cnn_model.add(Conv2D(32, kernel_size=kernel_size[1], strides=(strides[1], strides[1]), activation='relu'))
     cnn_model.add(MaxPooling2D(pool_size=(2, 2)))
     cnn_model.add(Dropout(dropout))
     cnn_model.add(Flatten())
     cnn_model.add(Dense(24, activation='softmax'))
 
-    print("CNN with epochs {0}, kernel size{1}, and dropout {2}".format(epochs, kernel_size, dropout))
+    print("CNN with epochs {0}, kernel size{1}, dropout {2}, strides{3}".format(epochs, kernel_size, dropout, strides))
     print("Compiling CNN")
     cnn_model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
