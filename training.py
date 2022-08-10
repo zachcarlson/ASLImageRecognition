@@ -38,26 +38,26 @@
 #################################################
 
 import itertools
-import os
-import matplotlib
-import numpy as np
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.random_projection import johnson_lindenstrauss_min_dim
-from sklearn.metrics import confusion_matrix, multilabel_confusion_matrix , classification_report
-import sys
-from sklearn.decomposition import PCA
-from sklearn.model_selection import train_test_split
-import matplotlib.pyplot as plt
 import keras
-from keras.models import Sequential
-from keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, Dropout
-from keras.optimizers import Adam
 from keras.callbacks import TensorBoard
 from keras.callbacks import EarlyStopping
-from sklearn.metrics import accuracy_score
-
-
+from keras.models import Sequential
+from keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, Dropout
+from keras.utils import np_utils
+import matplotlib
+import matplotlib.pyplot as plt
+import numpy as np
+import os
 import seaborn as sns
+from sklearn.decomposition import PCA
+from sklearn.metrics import confusion_matrix, multilabel_confusion_matrix , classification_report
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.random_projection import johnson_lindenstrauss_min_dim
+from sklearn.metrics import accuracy_score
+import sys
+from tensorflow.keras.optimizers import Adam
+
 process = 'Apply label to samples'
 csv_files_path = "CSV_Files/"
 letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y']
@@ -140,8 +140,8 @@ def CNN(data, epochs=10, kernel_size=[5,3], dropout=.20, strides=[5,3]):
     #reshape the array to fit the CNN
     X_train = X_train.reshape(X_train.shape[0], 224, 224, 1)
     X_validate = X_validate.reshape(X_validate.shape[0],224,224,1)
-    y_train = keras.utils.to_categorical(y_train, 24)
-    y_validate = keras.utils.to_categorical(y_validate, 24)
+    y_train = keras.utils.np_utils.to_categorical(y_train, 24)
+    y_validate = keras.utils.np_utils.to_categorical(y_validate, 24)
     X_test = X_test.reshape(X_test.shape[0], 224, 224, 1)
 
     # Defining the Convolutional Neural Network
