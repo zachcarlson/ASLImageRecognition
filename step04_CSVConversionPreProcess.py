@@ -43,7 +43,6 @@ def ConvertImagesToCSV(imageDir="", csvDir="",label=0):
             with open(csvDir + letter + "_img_pixels.csv", 'a') as f:
                 writer = csv.writer(f)
                 writer.writerow(value)
-            f.close()
 
         except IOError as e:
             print(e, "ERROR - failed to convert '%s'" % infile)

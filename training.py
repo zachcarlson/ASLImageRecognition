@@ -62,6 +62,9 @@ process = 'Apply label to samples'
 csv_files_path = "CSV_Files/"
 letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y']
 labels = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]
+seed = 42
+keras.utils.set_random_seed(seed)
+
 def LoadSamples(csvDir="",classStartAt=0):
     print('Loading samples...')
     samples = None
@@ -140,7 +143,9 @@ def CNN(data, epochs=10, kernel_size=[5,3], dropout=.20, strides=[5,3]):
     #reshape the array to fit the CNN
     X_train = X_train.reshape(X_train.shape[0], 224, 224, 1)
     X_validate = X_validate.reshape(X_validate.shape[0],224,224,1)
+    y_train_noCat = y_train
     y_train = keras.utils.np_utils.to_categorical(y_train, 24)
+    y_validate_noCat = y_validate
     y_validate = keras.utils.np_utils.to_categorical(y_validate, 24)
     X_test = X_test.reshape(X_test.shape[0], 224, 224, 1)
 
@@ -163,9 +168,20 @@ def CNN(data, epochs=10, kernel_size=[5,3], dropout=.20, strides=[5,3]):
     print("Training CNN")
     callback = EarlyStopping(monitor='loss', min_delta=0.01, patience=3)
     cnn_model.fit(X_train, y_train, validation_data=(X_validate, y_validate), epochs=epochs, callbacks=[callback])
-    test_predictions = cnn_model.predict(X_test)
-    print('Test Accuracy:',accuracy_score(y_test, np.argmax(test_predictions, axis=1)))
 
+    train_predictions = cnn_model.predict(X_train)
+    train_acc = accuracy_score(y_train, np.argmax(train_predictions, axis=1))
+
+    val_predictions = cnn_model.predict(X_validate)
+    val_acc = accuracy_score(y_validate, np.argmax(val_predictions, axis=1))
+
+
+    test_predictions = cnn_model.predict(X_test)
+    test_acc = accuracy_score(y_test, np.argmax(test_predictions, axis=1))
+    print('Train Accuracy:',train_acc)
+    print('Validation Accuracy:',val_acc)
+    print('Test Accuracy:',test_acc)
+    return train_acc, val_acc, test_acc
 
 def plot_confusion_matrix(cm, classes, hyperparameter,
                           normalize=False,
@@ -231,6 +247,7 @@ if len(args) == 2 and args[0] == "CNN" and args[1] == "HPLoop":
     for d in dropouts:
         for ks in kernel_sizes:
             CNN(data,epochs=10, kernel_size=ks, dropout=d)
+            
 elif len(args) == 2 and args[0] == "CNN":
     data = [X_train, y_train, X_validate, y_validate, X_test, y_test] = [None, None, None, None, None, None]
     print('Looking for data')
