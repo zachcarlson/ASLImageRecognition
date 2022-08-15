@@ -57,6 +57,7 @@ from sklearn.random_projection import johnson_lindenstrauss_min_dim
 from sklearn.metrics import accuracy_score
 import sys
 from tensorflow.keras.optimizers import Adam
+import pandas as pd
 
 process = 'Apply label to samples'
 csv_files_path = "CSV_Files/"
@@ -237,6 +238,8 @@ if len(args) == 1 and args[0] == "KNN":
     KNN(data, num_neighbors=n)
 if len(args) == 2 and args[0] == "CNN" and args[1] == "HPLoop":
     data = [X_train, y_train, X_validate, y_validate, X_test, y_test] = [None, None, None, None, None, None]
+    cnn_df = pd.DataFrame({'train_accuracy':[],'validation_accuracy':[],'test_accuracy':[],'dropout':[],          \
+    'kernel_size_layer1':[],'kernel_size_layer2':[],'kernel_size_layer3':[]})
     print('Looking for data')
     for i, saveName in enumerate(saveNamesCNN):
         with open(saveName, 'rb') as f:
@@ -246,10 +249,15 @@ if len(args) == 2 and args[0] == "CNN" and args[1] == "HPLoop":
     kernel_sizes = [[5,3],[4,4],[5,5]]
     for d in dropouts:
         for ks in kernel_sizes:
-            CNN(data,epochs=10, kernel_size=ks, dropout=d)
+            results = CNN(data,epochs=10, kernel_size=ks, dropout=d)
+            df = pd.DataFrame({'train_accuracy':[results[0]],'validation_accuracy':[results[1]],                  \
+            'test_accuracy':[results[2]],'dropout':[d],'kernel_size_layer1':[ks[0]],'kernel_size_layer2':[ks[1]],'kernel_size_layer3':[ks[2]]})
+            cnn_df = cnn_df.append(df, ignore_index=True)
+    cnn_df.to_csv('cnn_out.csv',index=False)
             
 elif len(args) == 2 and args[0] == "CNN":
     data = [X_train, y_train, X_validate, y_validate, X_test, y_test] = [None, None, None, None, None, None]
+    dat
     print('Looking for data')
     for i, saveName in enumerate(saveNamesCNN):
         with open(args[1] + saveName, 'rb') as f:
