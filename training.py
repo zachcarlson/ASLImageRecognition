@@ -39,7 +39,10 @@
 
 import itertools
 import keras
+import keras.models
 from keras.callbacks import TensorBoard
+
+from keras.preprocessing import image
 from keras.callbacks import EarlyStopping
 from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, Dropout
@@ -58,6 +61,7 @@ from sklearn.metrics import accuracy_score
 import sys
 from tensorflow.keras.optimizers import Adam
 import pandas as pd
+from PIL import Image as im
 
 process = 'Apply label to samples'
 csv_files_path = "CSV_Files/"
@@ -138,7 +142,30 @@ def KNN(data, num_neighbors = 3, havePlotUI=True):
     cm = confusion_matrix(y_true, y_pred, labels=labels)
     plot_confusion_matrix(cm, hyperparameter="num_neighbors "+str(n), classes=letters, haveUI=havePlotUI)
 
-def CNN(data, epochs=10, kernel_size=[5,3], dropout=.20, strides=[5,3]):
+
+def visualize_cnn_layers(img, cnn_model):
+    tensor_image = np.reshape(img, (1, 224, 224, 1))
+
+    # remove the flatten and dense layers
+    imp_layer_subs = ['conv', 'max', 'drop']
+    layer_names = [x.name for x in cnn_model.layers]
+    important_layer_names = [lay for lay in layer_names if any(sub in lay for sub in imp_layer_subs)]
+
+    layer_outputs = [layer.output for layer in cnn_model.layers[:len(important_layer_names)]]
+    activation_model = keras.models.Model(inputs=cnn_model.input, outputs=layer_outputs)
+    activations = activation_model.predict(tensor_image)
+
+    for x, act in enumerate(activations):
+        channel1 = 6
+        channel2 = 15
+        plt.matshow(act[0, :, :, channel1], cmap='viridis')
+        plt.title(important_layer_names[x] + ' channel ' + str(channel1))
+        plt.matshow(act[0, :, :, channel2], cmap='viridis')
+        plt.title(important_layer_names[x] + ' channel ' + str(channel2))
+    plt.show()
+
+
+def CNN(data, epochs=10, kernel_size=[5,3], dropout=.20, strides=[5,3], enable_feature_extraction=False):
     X_train, y_train,X_validate, y_validate, X_test, y_test = data
 
     #reshape the array to fit the CNN
@@ -149,6 +176,7 @@ def CNN(data, epochs=10, kernel_size=[5,3], dropout=.20, strides=[5,3]):
     y_validate_noCat = y_validate
     y_validate = keras.utils.np_utils.to_categorical(y_validate, 24)
     X_test = X_test.reshape(X_test.shape[0], 224, 224, 1)
+
 
     # Defining the Convolutional Neural Network
 
@@ -161,6 +189,12 @@ def CNN(data, epochs=10, kernel_size=[5,3], dropout=.20, strides=[5,3]):
     cnn_model.add(Dropout(dropout))
     cnn_model.add(Flatten())
     cnn_model.add(Dense(24, activation='softmax'))
+
+    cnn_model.summary()
+
+    if(enable_feature_extraction):
+        visualize_cnn_layers(X_test[0], cnn_model)
+        return
 
     print("CNN with epochs {0}, kernel size{1}, dropout {2}, strides{3}".format(epochs, kernel_size, dropout, strides))
     print("Compiling CNN")
@@ -238,8 +272,7 @@ if len(args) == 1 and args[0] == "KNN":
     KNN(data, num_neighbors=n)
 if len(args) == 2 and args[0] == "CNN" and args[1] == "HPLoop":
     data = [X_train, y_train, X_validate, y_validate, X_test, y_test] = [None, None, None, None, None, None]
-    cnn_df = pd.DataFrame({'train_accuracy':[],'validation_accuracy':[],'test_accuracy':[],'dropout':[],          \
-    'kernel_size_layer1':[],'kernel_size_layer2':[],'kernel_size_layer3':[]})
+    cnn_df = pd.DataFrame({'train_accuracy':[],'validation_accuracy':[],'test_accuracy':[],'dropout':[], 'kernel_size_layer1':[],'kernel_size_layer2':[],'kernel_size_layer3':[]})
     print('Looking for data')
     for i, saveName in enumerate(saveNamesCNN):
         with open(saveName, 'rb') as f:
@@ -250,20 +283,26 @@ if len(args) == 2 and args[0] == "CNN" and args[1] == "HPLoop":
     for d in dropouts:
         for ks in kernel_sizes:
             results = CNN(data,epochs=10, kernel_size=ks, dropout=d)
-            df = pd.DataFrame({'train_accuracy':[results[0]],'validation_accuracy':[results[1]],                  \
-            'test_accuracy':[results[2]],'dropout':[d],'kernel_size_layer1':[ks[0]],'kernel_size_layer2':[ks[1]],'kernel_size_layer3':[ks[2]]})
+            df = pd.DataFrame({'train_accuracy':[results[0]],'validation_accuracy':[results[1]],'test_accuracy':[results[2]],'dropout':[d],'kernel_size_layer1':[ks[0]],'kernel_size_layer2':[ks[1]],'kernel_size_layer3':[ks[2]]})
             cnn_df = cnn_df.append(df, ignore_index=True)
     cnn_df.to_csv('cnn_out.csv',index=False)
             
 elif len(args) == 2 and args[0] == "CNN":
     data = [X_train, y_train, X_validate, y_validate, X_test, y_test] = [None, None, None, None, None, None]
-    dat
     print('Looking for data')
     for i, saveName in enumerate(saveNamesCNN):
         with open(args[1] + saveName, 'rb') as f:
             data[i] = np.load(f)
     print('starting CNN')
     CNN(data)
+elif len(args) == 3 and args[0] == "CNN" and args[2] == "VisLayers":
+    data = [X_train, y_train, X_validate, y_validate, X_test, y_test] = [None, None, None, None, None, None]
+    print('Looking for data')
+    for i, saveName in enumerate(saveNamesCNN):
+        with open(args[1] + saveName, 'rb') as f:
+            data[i] = np.load(f)
+    print('starting CNN')
+    CNN(data, enable_feature_extraction=True)
 elif len(args) == 1 and args[0] == "CNN":
     data = [X_train, y_train, X_validate, y_validate, X_test, y_test] = [None, None, None, None, None, None]
     print('Looking for data')
