@@ -218,6 +218,63 @@ def CNN(data, epochs=10, kernel_size=[5,3], dropout=.20, strides=[5,3], enable_f
     print('Test Accuracy:',test_acc)
     return train_acc, val_acc, test_acc
 
+def CNN_Transfer_Learn(data, epochs=1):#original: 10 epochs
+    from tensorflow.keras.applications.vgg16 import VGG16
+
+    X_train, y_train,X_validate, y_validate, X_test, y_test = data
+
+    # originally not slicing to first 100 of data, use this line to severely quicken this function for testing for bugs
+    X_train, y_train,X_validate, y_validate, X_test, y_test = X_train[:10], y_train[:10], X_validate[:10], y_validate[:10], X_test[:10], y_test[:10]
+
+    #reshape the array to fit the CNN
+    X_train = X_train.reshape(X_train.shape[0], 224, 224, 1)
+    X_validate = X_validate.reshape(X_validate.shape[0],224,224,1)
+    y_train_noCat = y_train
+    y_train = keras.utils.np_utils.to_categorical(y_train, 24)
+    y_validate_noCat = y_validate
+    y_validate = keras.utils.np_utils.to_categorical(y_validate, 24)
+    X_test = X_test.reshape(X_test.shape[0], 224, 224, 1)
+
+    print("Setting up VGG16 with custom final layer...")
+    # Create a VGG16 model. Remove the last layer that was classifying, to be replaced with our own classifier layer.
+    vgg = VGG16(input_shape=[224,244,1], weights='imagenet', include_top=False) #Training with Imagenet weights
+    # Set layers as not trainable, maybe add boolean to toggle this.
+    for layer in vgg.layers:
+        layer.trainable = False
+    x = Flatten()(vgg.output) #vgg16 output is now flattened. 
+    prediction = Dense(24, activation='softmax')(x) # 24 classes to predict in final layer
+
+    #create, compile, and fit the model 
+    cnn_model = Model(inputs=vgg.input, outputs=prediction)
+    cnn_model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy']) 
+    history = cnn_model.fit(X_train, validation_data=validation_set, epochs=20, batch_size=32)
+
+    print("Plotting history...")
+    #loss plots
+    plt.plot(history.history['loss'], label='train loss')
+    plt.plot(history.history['val_loss'], label='val loss')
+    plt.legend()
+    plt.show()
+    #accuracy plots
+    plt.plot(history.history['accuracy'], label='train acc')
+    plt.plot(history.history['val_accuracy'], label='val acc')
+    plt.legend()
+    plt.show()
+
+    print("Calculating prediction accuracy...")
+    #end results (accuracies)
+    train_predictions = cnn_model.predict(X_train)
+    train_acc = accuracy_score(y_train, np.argmax(train_predictions, axis=1))
+    val_predictions = cnn_model.predict(X_validate)
+    val_acc = accuracy_score(y_validate, np.argmax(val_predictions, axis=1))
+    test_predictions = cnn_model.predict(X_test)
+    test_acc = accuracy_score(y_test, np.argmax(test_predictions, axis=1))
+    print('Train Accuracy:',train_acc)
+    print('Validation Accuracy:',val_acc)
+    print('Test Accuracy:',test_acc)
+    return train_acc, val_acc, test_acc
+
+
 def plot_confusion_matrix(cm, classes, hyperparameter,
                           normalize=False,
                           title='Confusion matrix',
@@ -311,6 +368,15 @@ elif len(args) == 1 and args[0] == "CNN":
             data[i] = np.load(f)
     print('starting CNN')
     CNN(data)
+elif len(args) == 1 and args[0] == "CNN_Transfer":
+    data = [X_train, y_train, X_validate, y_validate, X_test, y_test] = [None, None, None, None, None, None]
+    print('Looking for data')
+    for i, saveName in enumerate(saveNamesCNN):
+        with open(saveName, 'rb') as f:
+            data[i] = np.load(f)
+    print('Starting CNN with Transfer Learning')
+    CNN_Transfer_Learn(data)
+    
 
 elif len(args) == 2 and args[0] == "KNN" and args[1] == "NoPlotUI":
     matplotlib.use('Agg') # no UI backend
