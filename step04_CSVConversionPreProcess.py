@@ -5,7 +5,7 @@ import numpy as np
 import csv
 
 
-def ConvertImagesToCSV(imageDir="", csvDir="",label=0):
+def ConvertImagesToCSV(imageDir="", csvDir="",label=0, fromGrey=True):
     
     #Can't find Image Directory
     if not os.path.exists(imageDir):
@@ -29,43 +29,44 @@ def ConvertImagesToCSV(imageDir="", csvDir="",label=0):
 
     #Create CSV File from Images
     for i, infile in enumerate(os.listdir(imageDir)):
-
         try:
             #Open Image
             img_file = Image.open(imageDir + infile)
-
             #get the letter for saving
             letter = infile[0]
-
-            value = np.asarray(img_file.getdata(), dtype=int).reshape((img_file.size[1], img_file.size[0]))
-            value = value.flatten()
-            value = np.concatenate([[label], value])
-            with open(csvDir + letter + "_img_pixels.csv", 'a') as f:
-                writer = csv.writer(f)
-                writer.writerow(value)
+            value = None
+            if fromGrey:
+                value = np.asarray(img_file.getdata(), dtype=int).reshape((img_file.size[1], img_file.size[0]))
+                value = value.flatten()
+                value = np.concatenate([[label], value])
+                with open(csvDir + letter + "_img_pixels.csv", 'a') as f:
+                    writer = csv.writer(f)
+                    writer.writerow(value)
+            else:
+                value = np.array(img_file)
 
         except IOError as e:
             print(e, "ERROR - failed to convert '%s'" % infile)
 
 
-def LaunchConvert(subdirectories=True, inpath="gray_frames/", outpath="CSV_Files/"):
+def LaunchConvert(subdirectories=True, inpath="gray_frames/", outpath="CSV_Files/", grey = True):
     print("Converting...")
 
     if subdirectories:
         dirs = os.listdir(inpath)
         for i,d in enumerate(dirs):
             print("Converting image files in directory:", inpath + d + '/')
-            ConvertImagesToCSV(inpath + d + '/', outpath + d + '/',label=i)
+            ConvertImagesToCSV(inpath + d + '/', outpath + d + '/',label=i, fromGrey = grey)
     else:
-        ConvertImagesToCSV(inpath, outpath)
+        ConvertImagesToCSV(inpath, outpath, fromGrey)
 
 
 args = sys.argv
 if len(args) < 2:
-    LaunchConvert(subdirectories=True, inpath="gray_frames/", outpath="CSV_Files/")
-elif len(args) < 4:
+    LaunchConvert(subdirectories=True, inpath="gray_frames/", outpath="CSV_Files/", grey = True)
+elif len(args) < 5:
     print(
-        "Not enough arguments. Please provide: 1)subdirectories (boolean), 2)inpath (relative to working directory, ending in /), 3)outpath (ending in /)")
+        "Not enough arguments. Please provide: 1)subdirectories (boolean), 2)inpath (relative to working directory, ending in /), 3)outpath (ending in /), 4)from greyscale images bool")
 else:
-    LaunchConvert(subdirectories=True if args[1] == "True" else False,
-                  inpath=args[2], outpath=args[3])
+    LaunchConvert(subdirectories= (args[1] == "True"),
+                  inpath=args[2], outpath=args[3], grey = (args[4]=='True'))
