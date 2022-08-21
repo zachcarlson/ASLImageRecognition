@@ -218,26 +218,26 @@ def CNN(data, epochs=10, kernel_size=[5,3], dropout=.20, strides=[5,3], enable_f
     print('Test Accuracy:',test_acc)
     return train_acc, val_acc, test_acc
 
-def CNN_Transfer_Learn(data, epochs=1):#original: 10 epochs
-    from tensorflow.keras.applications.vgg16 import VGG16
-
-    X_train, y_train,X_validate, y_validate, X_test, y_test = data
-
-    # originally not slicing to first 100 of data, use this line to severely quicken this function for testing for bugs
-    X_train, y_train,X_validate, y_validate, X_test, y_test = X_train[:10], y_train[:10], X_validate[:10], y_validate[:10], X_test[:10], y_test[:10]
-
-    #reshape the array to fit the CNN
-    X_train = X_train.reshape(X_train.shape[0], 224, 224, 1)
-    X_validate = X_validate.reshape(X_validate.shape[0],224,224,1)
-    y_train_noCat = y_train
-    y_train = keras.utils.np_utils.to_categorical(y_train, 24)
-    y_validate_noCat = y_validate
-    y_validate = keras.utils.np_utils.to_categorical(y_validate, 24)
-    X_test = X_test.reshape(X_test.shape[0], 224, 224, 1)
+def CNN_Transfer_Learn(num_epochs=4, haveUI = False):#original: 10 epochs
+    if haveUI == False:
+        matplotlib.use('Agg') # no UI backend
+    from tensorflow.keras.preprocessing.image import ImageDataGenerator
+    train_path = 'split_images/train_images'
+    valid_path = 'split_images/val_images'
+    test_path = 'split_images/test_images'
+    num_classes = 24
+    datagen_train = ImageDataGenerator()#(validation_split=0.01) #uncomment for minibatch
+    datagen_val = ImageDataGenerator()#(validation_split=0.01) #uncomment for minibatch
+    datagen_test = ImageDataGenerator()#(validation_split=0.01) #uncomment for minibatch
+    train_set = datagen_train.flow_from_directory(train_path,target_size = (224, 224),batch_size = 64,class_mode = 'categorical',seed = 42, shuffle = True)#,subset='validation') #uncomment for minibatch
+    validation_set = datagen_val.flow_from_directory(valid_path, target_size = (224, 224), batch_size = 64, class_mode = 'categorical',seed = 42, shuffle = True)#,subset='validation') #uncomment for minibatch
+    test_set = datagen_test.flow_from_directory(test_path, target_size = (224, 224), batch_size = 32, class_mode = 'categorical',seed = 42, shuffle = True)#,subset='validation') #uncomment for minibatch
 
     print("Setting up VGG16 with custom final layer...")
+    from tensorflow.keras.applications.vgg16 import VGG16
+    from tensorflow.keras.models import Model
     # Create a VGG16 model. Remove the last layer that was classifying, to be replaced with our own classifier layer.
-    vgg = VGG16(input_shape=[224,244,1], weights='imagenet', include_top=False) #Training with Imagenet weights
+    vgg = VGG16(input_shape=[224,244,3], weights='imagenet', include_top=False) #Training with Imagenet weights
     # Set layers as not trainable, maybe add boolean to toggle this.
     for layer in vgg.layers:
         layer.trainable = False
@@ -247,32 +247,44 @@ def CNN_Transfer_Learn(data, epochs=1):#original: 10 epochs
     #create, compile, and fit the model 
     cnn_model = Model(inputs=vgg.input, outputs=prediction)
     cnn_model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy']) 
-    history = cnn_model.fit(X_train, validation_data=validation_set, epochs=20, batch_size=32)
+    history = cnn_model.fit(train_set, validation_data=validation_set, epochs=num_epochs, batch_size=32)
 
     print("Plotting history...")
     #loss plots
     plt.plot(history.history['loss'], label='train loss')
     plt.plot(history.history['val_loss'], label='val loss')
     plt.legend()
-    plt.show()
+    if haveUI:
+        plt.show()
+    else:
+        plt.savefig("cnn_transfer_loss")  #savefig, don't show
+    plt.cla()
+    plt.close()
     #accuracy plots
     plt.plot(history.history['accuracy'], label='train acc')
     plt.plot(history.history['val_accuracy'], label='val acc')
     plt.legend()
-    plt.show()
-
+    if haveUI:
+        plt.show()
+    else:
+        plt.savefig("cnn_transfer_accuracy")  #savefig, don't show
+    plt.cla()
+    plt.close()
     print("Calculating prediction accuracy...")
+
+    cnn_model.evaluate(train_set)
+    cnn_model.evaluate(validation_set)
+    cnn_model.evaluate(test_set)
     #end results (accuracies)
-    train_predictions = cnn_model.predict(X_train)
-    train_acc = accuracy_score(y_train, np.argmax(train_predictions, axis=1))
-    val_predictions = cnn_model.predict(X_validate)
-    val_acc = accuracy_score(y_validate, np.argmax(val_predictions, axis=1))
-    test_predictions = cnn_model.predict(X_test)
-    test_acc = accuracy_score(y_test, np.argmax(test_predictions, axis=1))
-    print('Train Accuracy:',train_acc)
-    print('Validation Accuracy:',val_acc)
-    print('Test Accuracy:',test_acc)
-    return train_acc, val_acc, test_acc
+
+    train_eval = cnn_model.evaluate(train_set)
+    val_eval = cnn_model.evaluate(validation_set)
+    test_eval = cnn_model.evaluate(test_set)
+    print('Train Accuracy:',train_eval[1])
+    print('Train Loss:',train_eval[0])
+    print('Validation Accuracy:',val_eval[1])
+    print('Test Accuracy:',test_eval[1])
+    return train_eval, val_eval, test_eval
 
 
 def plot_confusion_matrix(cm, classes, hyperparameter,
@@ -343,7 +355,7 @@ if len(args) == 2 and args[0] == "CNN" and args[1] == "HPLoop":
             df = pd.DataFrame({'train_accuracy':[results[0]],'validation_accuracy':[results[1]],'test_accuracy':[results[2]],'dropout':[d],'kernel_size_layer1':[ks[0]],'kernel_size_layer2':[ks[1]],'kernel_size_layer3':[ks[2]]})
             cnn_df = cnn_df.append(df, ignore_index=True)
     cnn_df.to_csv('cnn_out.csv',index=False)
-            
+
 elif len(args) == 2 and args[0] == "CNN":
     data = [X_train, y_train, X_validate, y_validate, X_test, y_test] = [None, None, None, None, None, None]
     print('Looking for data')
@@ -369,13 +381,7 @@ elif len(args) == 1 and args[0] == "CNN":
     print('starting CNN')
     CNN(data)
 elif len(args) == 1 and args[0] == "CNN_Transfer":
-    data = [X_train, y_train, X_validate, y_validate, X_test, y_test] = [None, None, None, None, None, None]
-    print('Looking for data')
-    for i, saveName in enumerate(saveNamesCNN):
-        with open(saveName, 'rb') as f:
-            data[i] = np.load(f)
-    print('Starting CNN with Transfer Learning')
-    CNN_Transfer_Learn(data)
+    CNN_Transfer_Learn()
     
 
 elif len(args) == 2 and args[0] == "KNN" and args[1] == "NoPlotUI":
