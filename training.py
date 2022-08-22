@@ -270,21 +270,11 @@ def CNN_Transfer_Learn(num_epochs=4, haveUI = False):#original: 10 epochs
         plt.savefig("cnn_transfer_accuracy")  #savefig, don't show
     plt.cla()
     plt.close()
-    print("Calculating prediction accuracy...")
-
-    cnn_model.evaluate(train_set)
-    cnn_model.evaluate(validation_set)
-    cnn_model.evaluate(test_set)
-    #end results (accuracies)
-
-    train_eval = cnn_model.evaluate(train_set)
-    val_eval = cnn_model.evaluate(validation_set)
+    print("Calculating prediction accuracy on test set...")
+    #end results (test accuracy)
     test_eval = cnn_model.evaluate(test_set)
-    print('Train Accuracy:',train_eval[1])
-    print('Train Loss:',train_eval[0])
-    print('Validation Accuracy:',val_eval[1])
     print('Test Accuracy:',test_eval[1])
-    return train_eval, val_eval, test_eval
+    return test_eval
 
 
 def plot_confusion_matrix(cm, classes, hyperparameter,
