@@ -10,12 +10,16 @@ Our project focused on American Sign Language (ASL).  The goal of this project w
 ## File Manifest: 
 - `Folder /data` - Contains all small data files
   - `letter_means_df.csv` - Mean pixel values for each letter
-- `Folder /documents` - Contains all reports as required for class
-  - `Launch Report - Final Version.pdf` - PDF of first report for class
-  - `DSCI 591 Data Acquisition and Pre-Processing Report.pdf` - PDF of second report for class.
-  - `DSCI 591 Exploratory Data Analytics Report.docx` - Third report for class.
-  - `Pitch.pptx` - Slides for first presentation in class
-  - `Status Report.ppx` - Slides for second presentation in class
+- `Folder /documents` - Contains all reports as required for DSCI 591.
+  - `Launch Report - Final Version.pdf` - PDF of first report for DSCI 591.
+  - `DSCI 591 Data Acquisition and Pre-Processing Report.pdf` - PDF of second report for DSCI 591.
+  - `DSCI 591 Exploratory Data Analytics Report.docx` - Third report for DSCI 591.
+  - `Pitch.pptx` - Slides for first presentation in DSCI 591.
+  - `Status Report.pptx` - Slides for second presentation in DSCI 591.
+  - `DSCI 592 Predictive Modeling Report.pdf` - PDF for report in DSCI 592.
+  - `G5-PMR-Slides.pptx` - Slides for first presentation in DSCI 592.
+  - `G5-PMR-Slides-Final.pptx` - Slides for second presentation in DSCI 592.
+  - `DSCI 592 PMR.docx` - PDF of major report for class (DSCI 592).
 - `Folder /images` - Contains all relevant figures created for the project
   - `Folder /FeatureMeansSummary` - Contains all summary figures for each letter
   - `StandardDeviationOfAllClasses.png` - Composite image of standard deviations of each pixel mean value across each letter.  (See `ASLImageRecognition.ipynb` for more information.)
