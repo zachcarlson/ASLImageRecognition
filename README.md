@@ -19,16 +19,23 @@ Our project focused on American Sign Language (ASL).  The goal of this project w
   - `DSCI 592 Predictive Modeling Report.pdf` - PDF for report in DSCI 592.
   - `G5-PMR-Slides.pptx` - Slides for first presentation in DSCI 592.
   - `G5-PMR-Slides-Final.pptx` - Slides for second presentation in DSCI 592.
-  - `DSCI 592 PMR.docx` - PDF of major report for class (DSCI 592).
+  - `DSCI 592 PMR.docx` - PDF of major report for DSCI 592.
 - `Folder /images` - Contains all relevant figures created for the project
   - `Folder /FeatureMeansSummary` - Contains all summary figures for each letter
   - `StandardDeviationOfAllClasses.png` - Composite image of standard deviations of each pixel mean value across each letter.  (See `ASLImageRecognition.ipynb` for more information.)
+  - `k_accuracy_plot.png` - Plot of K versus accuracy for KNN.
+  - `cnn_transfer_accuracy.png` - Plot of training and validation accuracy across epochs for CNN.
+  - `cnn_transfer_loss.png` - Plot of training and validation loss across epochs for CNN.
+- `Folder /CNN OUTPUT` - Contains performance outputs for CNN hyperparamater tuning.
+- `Folder /CNN TRANSFER OUTPUT` - Contains performance outputs for Transfer CNN.
 - `ASLImageRecognition.ipynb` - Jupyter Notebook used for some EDA visualizations
 - `step01_VideoSplitPreProcess.py` - Python script to split raw video footage into series of frames
 - `step02_CropPreProcess.py` - Python script to center and crop images 
 - `step03_GrayscalePreProcess.py` - Python script to convert images to grayscale
 - `step04_CSVConversionPreProcess.py` - Python script to convert grayscale images to CSV
 - `step05_EDA.py` - Python script to produce some EDA visualizations
+- `step06_training.py` - Python script for training of KNN and CNN (not for transfer CNN).
+- `step07_split_images.py` - Python script to split and format images for transfer CNN.
 
 
 ## Reason for Project:
