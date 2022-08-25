@@ -28,6 +28,7 @@ Our project focused on American Sign Language (ASL).  The goal of this project w
   - `cnn_transfer_loss.png` - Plot of training and validation loss across epochs for CNN.
 - `Folder /CNN OUTPUT` - Contains performance outputs for CNN hyperparamater tuning.
 - `Folder /CNN TRANSFER OUTPUT` - Contains performance outputs for Transfer CNN.
+- `Folder /KNN OUTPUT` - Contains performance outputs for KNN.
 - `ASLImageRecognition.ipynb` - Jupyter Notebook used for some EDA visualizations
 - `step01_VideoSplitPreProcess.py` - Python script to split raw video footage into series of frames
 - `step02_CropPreProcess.py` - Python script to center and crop images 
