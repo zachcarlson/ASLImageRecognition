@@ -19,7 +19,7 @@ Our project focused on American Sign Language (ASL).  The goal of this project w
   - `DSCI 592 Predictive Modeling Report.pdf` - PDF for report in DSCI 592.
   - `G5-PMR-Slides.pptx` - Slides for first presentation in DSCI 592.
   - `G5-PMR-Slides-Final.pptx` - Slides for second presentation in DSCI 592.
-  - `DSCI 592 PMR.docx` - PDF of major report for DSCI 592.
+  - `G5-PMR-Final.docx` - Final report of project for DSCI 592.
 - `Folder /figures` - Contains all relevant figures created for the project
   - `Folder /FeatureMeansSummary` - Contains all summary figures for each letter
   - `StandardDeviationOfAllClasses.png` - Composite image of standard deviations of each pixel mean value across each letter.  (See `ASLImageRecognition.ipynb` for more information.)
