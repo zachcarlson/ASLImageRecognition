@@ -113,7 +113,7 @@ python .\step04_CSVConversionPreProcess.py
 ```
 8. Running the following command will produce the EDA figures for this project:
 ```
-python .\step05_EDA.py
+python .\step05_EDA.py "FeatureMeansPerClass" .\csv_files\
 ```
 9. Running the following command will do training:
 ```
