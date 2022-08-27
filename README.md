@@ -86,10 +86,8 @@ Our team consisted of the following individuals (alphabetized by last name):
 ```
   /ASLImageRecognition
     /Videos
-      /A
-        A.mp4
-      /B
-        B.mp4
+      A.mp4
+      B.mp4
       ..
 ```
 - Add the following empty folders to the root repository directory:  `uncropped_frames`
