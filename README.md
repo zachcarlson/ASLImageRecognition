@@ -63,11 +63,12 @@ Our team consisted of the following individuals (alphabetized by last name):
 ## Project Requirements
 - Access to videos showing different ASL hand signs.  (For the time being, you can access ours [here](https://drive.google.com/drive/folders/1JfsDvx-Aq5ppHAef4y6wsKiAlfmYYm6V?usp=sharing), but these may not be availalbe to the public in the future.)
 - IDE to run Python scripts
-- Correct folder organization (see individual `.py` files and their functions for more information.)
+- Correct folder organization (see individual `.py` files and their functions, as well as the **How To Execute Notebook** section, for more information.)
 
 
 ## Python Requirements
 - Python ≥ 3.8.
+- `keras` version 2.9.0
 - The following modules and packages are required:
   - `csv`
   - `cv2`
@@ -81,8 +82,10 @@ Our team consisted of the following individuals (alphabetized by last name):
 
 ## How to Execute Notebook: 
 
+**NOTE:** These instructions are for Windows.  You may need to modify the scripts for Mac.
+
 1. Download repository.
-2. Access the videos linked in **Project Requirements**, or create your own 30 second `.mp4` clips for each letter.  Add these videos to the repository with the following file organization:
+2. Access the videos linked in **Project Requirements**, or create your own 30 second `.mp4` clips for each letter (excluding J and Z).  Add these videos to the repository with the following file organization:
 ```
   /ASLImageRecognition
     /Videos
@@ -90,6 +93,15 @@ Our team consisted of the following individuals (alphabetized by last name):
       B.mp4
       ..
 ```
+3.  Open a terminal window in your preferred Python IDE, we recommend [Visual Studio Code](https://code.visualstudio.com/).  
+4.  From the Terminal Window, run the following scripts:
+
+Split videos into images.
+```
+PS C:\...\ImageRecognition>  python .\step01_VideoSplitPreProcess.py
+```
+
+
 - Add the following empty folders to the root repository directory:  `uncropped_frames`
 - Ensure you have the correct folder organization.  For example, `step02_CropPreProcess.py` expects an "uncropped" directory in the working directory with images to be cropped.  
 - Run each `.py` script.  After completing `step04_CSVConversionPreProcess.py`, it will be possible to run `ASLImageRecognition.ipynb`.
