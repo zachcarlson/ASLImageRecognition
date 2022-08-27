@@ -93,7 +93,7 @@ Our team consisted of the following individuals (alphabetized by last name):
       B.mp4
       ..
 ```
-3.  Open a terminal window in your preferred Python IDE, we recommend [Visual Studio Code](https://code.visualstudio.com/).  
+3.  Open a terminal window in your preferred Python IDE, we recommend [Visual Studio Code](https://code.visualstudio.com/).  The current working directory should be `/ImageRecognition` for all following commands.
 
 4.  Running the following command will split the `.mp4` in `/Videos` into images.  They'll be saved in a new created folder `uncropped_frames`:
 ```
