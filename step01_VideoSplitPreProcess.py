@@ -9,7 +9,7 @@ for x in letters:
     current_letter = x
     dir_name = os.path.dirname(__file__)
     filename = os.path.join(dir_name, 'Videos', current_letter + '.mp4')
-    frame_location = os.path.join(dir_name, 'framed_videos', 'letter_' + current_letter)
+    frame_location = os.path.join(dir_name, 'uncropped_frames', 'letter_' + current_letter)
     CHECK_FOLDER = os.path.isdir(frame_location)
 
     # If folder doesn't exist, then create it.
