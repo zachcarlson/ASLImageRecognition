@@ -116,18 +116,22 @@ python .\step04_CSVConversionPreProcess.py
 ```
 python .\step05_EDA.py
 ```
-9. Running the following two commands will generate the required numpy files for KNN and then run KNN:
+9. Running the following two commands will generate the required numpy files for KNN (and save these in `numpy_files`) and then run KNN:
 ```
+#create numpy files for KNN
 python .\step06_training.py DimReduce
 ```
 ```
-python .\step06_training.py KNN HyperTweak NoPlotUI 3 5 10 15 20 30 40 50
+#Run KNN with k=3, 5, 10, 15, 20, 30, 40, 50
+python .\step06_training.py KNN HyperTweak 3 5 10 15 20 30 40 50
 ```
-10. Running the following two commands will generate the required numpy files for CNN and then run CNN:
+10. Running the following two commands will generate the required numpy files for CNN (and save these in `numpy_files`) and then run CNN:
 ```
+#create numpy files for CNN
 python .\step06_training.py csvToNpy
 ```
 ```
+#run CNN
 python .\step06_training.py CNN
 ```
 11. Running the following command will run Transfer Learning CNN:
