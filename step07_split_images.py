@@ -1,4 +1,4 @@
-#to execute from command line: /bin/python3 split_images.py
+#to execute from command line: /bin/python3 step07_split_images.py
 
 # split images into train, val, test directories, with subdirectories of each class
 

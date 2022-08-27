@@ -9,13 +9,13 @@
 # KNN needs dimension reduced data in order to avoid overfitting and have shorter processing time
 # To generate the necessary npy files, run the following in command line:
 #
-# /bin/python3 training.py DimReduce
+# /bin/python3 step06_training.py DimReduce
 #
 # Exact python argument syntax may vary per setup. This will output all necessary npy files to your execution directory.
 #
 # To execute KNN run the following from command line:
 #
-# /bin/python3 training.py KNN HyperTweak NoPlotUI 3 5 10 15 20 30 40 50
+# /bin/python3 step06_training.py KNN HyperTweak NoPlotUI 3 5 10 15 20 30 40 50
 #
 # The numbers to the far right each represent a different number of neighbors to consider in the KNN model.
 # In otherwords, they reach represent a hyperparameter value in the hyperparameter tweak loop.
@@ -27,13 +27,13 @@
 # CNN does NOT need dimension reduced data but npy files are still the ideal input format.
 # To generate the necessary npy files, run the following in command line:
 #
-# /bin/python3 training.py csvToNpy
+# /bin/python3 step06_training.py csvToNpy
 #
 # This will output all necessary npy files to your execution directory.
 # 
 # To execute CNN run the following from command line:
 #
-# /bin/python3 training.py CNN
+# /bin/python3 step06_training.py CNN
 #
 #################################################
 
@@ -41,16 +41,19 @@ import itertools
 import keras
 import keras.models
 from keras.callbacks import TensorBoard
-
 from keras.preprocessing import image
 from keras.callbacks import EarlyStopping
 from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, Dropout
+from keras.optimizers import Adam
 from keras.utils import np_utils
+from keras.utils import set_random_seed
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import pandas as pd
+from PIL import Image as im
 import seaborn as sns
 from sklearn.decomposition import PCA
 from sklearn.metrics import confusion_matrix, multilabel_confusion_matrix , classification_report
@@ -59,18 +62,15 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.random_projection import johnson_lindenstrauss_min_dim
 from sklearn.metrics import accuracy_score
 import sys
-from tensorflow.keras.optimizers import Adam
-import pandas as pd
-from PIL import Image as im
 
-process = 'Apply label to samples'
 csv_files_path = "CSV_Files/"
 letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y']
 labels = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]
-seed = 42
-keras.utils.set_random_seed(seed)
+seed = 42 
+set_random_seed(seed) #set random seed for reproducibility
 
 def LoadSamples(csvDir="",classStartAt=0):
+    '''Import image data and save it into a .csv per class'''
     print('Loading samples...')
     samples = None
     for i, indir in enumerate(os.listdir(csvDir)):
@@ -93,6 +93,7 @@ def LoadSamples(csvDir="",classStartAt=0):
     return samples[:,1:], np.ravel(samples[:,:1])
 
 def DimensionReduce(X_train, y_train, X_validate, X_test):
+    '''Use Dimensionality reduction (PCA) to reduce dataset size and number of features'''
     #johnson lindenstrauss lemma computation for ideal minimum number of dimensions
     epsilon = .15 #permitted error %
     min_dim = johnson_lindenstrauss_min_dim(22344, eps=epsilon)
@@ -108,6 +109,7 @@ def DimensionReduce(X_train, y_train, X_validate, X_test):
     return X_train_reduced, X_validate_reduced, X_test_reduced
 
 def ConvertToNpy(saveNames, reduce = False):
+    '''Convert .csv files to numpy files.'''
     samples, labels = LoadSamples(csvDir=csv_files_path, classStartAt=0)
     # 70% train. Stratify keeps class distribution balanced
     X_train, X_test, y_train, y_test = train_test_split(samples, labels, test_size=.3, random_state=42,
@@ -126,6 +128,7 @@ def ConvertToNpy(saveNames, reduce = False):
             np.save(f, data[i])
 
 def KNN(data, num_neighbors = 3, havePlotUI=True):
+    '''Run K-Nearest Neighbors'''
     #split data
     X_train,  y_train, X_validate, y_validate, X_test, y_test = data
     neigh = KNeighborsClassifier(n_neighbors=num_neighbors)
@@ -142,8 +145,8 @@ def KNN(data, num_neighbors = 3, havePlotUI=True):
     cm = confusion_matrix(y_true, y_pred, labels=labels)
     plot_confusion_matrix(cm, hyperparameter="num_neighbors "+str(n), classes=letters, haveUI=havePlotUI)
 
-
 def visualize_cnn_layers(img, cnn_model):
+    '''Visualize layers from the CNN'''
     tensor_image = np.reshape(img, (1, 224, 224, 1))
 
     # remove the flatten and dense layers
@@ -164,8 +167,9 @@ def visualize_cnn_layers(img, cnn_model):
         plt.title(important_layer_names[x] + ' channel ' + str(channel2))
     plt.show()
 
-
 def CNN(data, epochs=10, kernel_size=[5,3], dropout=.20, strides=[5,3], enable_feature_extraction=False):
+    '''Run CNN'''
+
     X_train, y_train,X_validate, y_validate, X_test, y_test = data
 
     #reshape the array to fit the CNN
@@ -218,69 +222,11 @@ def CNN(data, epochs=10, kernel_size=[5,3], dropout=.20, strides=[5,3], enable_f
     print('Test Accuracy:',test_acc)
     return train_acc, val_acc, test_acc
 
-def CNN_Transfer_Learn(num_epochs=4, haveUI = False):#original: 10 epochs
-    if haveUI == False:
-        matplotlib.use('Agg') # no UI backend
-    from tensorflow.keras.preprocessing.image import ImageDataGenerator
-    train_path = 'split_images/train_images'
-    valid_path = 'split_images/val_images'
-    test_path = 'split_images/test_images'
-    num_classes = 24
-    datagen_train = ImageDataGenerator()#(validation_split=0.01) #uncomment for minibatch
-    datagen_val = ImageDataGenerator()#(validation_split=0.01) #uncomment for minibatch
-    datagen_test = ImageDataGenerator()#(validation_split=0.01) #uncomment for minibatch
-    train_set = datagen_train.flow_from_directory(train_path,target_size = (224, 224),batch_size = 64,class_mode = 'categorical',seed = 42, shuffle = True)#,subset='validation') #uncomment for minibatch
-    validation_set = datagen_val.flow_from_directory(valid_path, target_size = (224, 224), batch_size = 64, class_mode = 'categorical',seed = 42, shuffle = True)#,subset='validation') #uncomment for minibatch
-    test_set = datagen_test.flow_from_directory(test_path, target_size = (224, 224), batch_size = 32, class_mode = 'categorical',seed = 42, shuffle = True)#,subset='validation') #uncomment for minibatch
-
-    print("Setting up VGG16 with custom final layer...")
-    from tensorflow.keras.applications.vgg16 import VGG16
-    from tensorflow.keras.models import Model
-    # Create a VGG16 model. Remove the last layer that was classifying, to be replaced with our own classifier layer.
-    vgg = VGG16(input_shape=[224,244,3], weights='imagenet', include_top=False) #Training with Imagenet weights
-    # Set layers as not trainable, maybe add boolean to toggle this.
-    for layer in vgg.layers:
-        layer.trainable = False
-    x = Flatten()(vgg.output) #vgg16 output is now flattened. 
-    prediction = Dense(24, activation='softmax')(x) # 24 classes to predict in final layer
-
-    #create, compile, and fit the model 
-    cnn_model = Model(inputs=vgg.input, outputs=prediction)
-    cnn_model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy']) 
-    history = cnn_model.fit(train_set, validation_data=validation_set, epochs=num_epochs, batch_size=32)
-
-    print("Plotting history...")
-    #loss plots
-    plt.plot(history.history['loss'], label='train loss')
-    plt.plot(history.history['val_loss'], label='val loss')
-    plt.legend()
-    if haveUI:
-        plt.show()
-    else:
-        plt.savefig("cnn_transfer_loss")  #savefig, don't show
-    plt.cla()
-    plt.close()
-    #accuracy plots
-    plt.plot(history.history['accuracy'], label='train acc')
-    plt.plot(history.history['val_accuracy'], label='val acc')
-    plt.legend()
-    if haveUI:
-        plt.show()
-    else:
-        plt.savefig("cnn_transfer_accuracy")  #savefig, don't show
-    plt.cla()
-    plt.close()
-    print("Calculating prediction accuracy on test set...")
-    #end results (test accuracy)
-    test_eval = cnn_model.evaluate(test_set)
-    print('Test Accuracy:',test_eval[1])
-    return test_eval
-
-
 def plot_confusion_matrix(cm, classes, hyperparameter,
                           normalize=False,
                           title='Confusion matrix',
                           cmap=plt.cm.Blues, haveUI=True):
+    '''Plot a confusion matrix for the KNN'''
 
     plt.imshow(cm, interpolation='nearest', cmap=cmap)
     plt.title(title)
@@ -317,18 +263,11 @@ args = sys.argv
 saveNamesKNN=["X_train_reduced.npy","y_train_reduced.npy","X_validation_reduced.npy","y_validation_reduced.npy","X_test_reduced.npy","y_test_reduced.npy"]
 saveNamesCNN=["X_train.npy","y_train.npy","X_validation.npy","y_validation.npy","X_test.npy","y_test.npy"]
 
-if('training.py' in args[0]):
+#Remove step06_training.py from arguments list
+if('step06_training.py' in args[0]):
     args = args[1:]
 
-if len(args) == 1 and args[0] == "KNN":
-    data = [X_train, y_train, X_validate, y_validate, X_test, y_test] = [None, None, None, None, None, None]
-    print('Looking for data')
-    for i, saveName in enumerate(saveNamesKNN):
-        with open(saveName, 'rb') as f:
-            data[i] = np.load(f)
-    n = 10
-    print('starting KNN with',n,"neighbors...")
-    KNN(data, num_neighbors=n)
+#Do CNN with HPLoop
 if len(args) == 2 and args[0] == "CNN" and args[1] == "HPLoop":
     data = [X_train, y_train, X_validate, y_validate, X_test, y_test] = [None, None, None, None, None, None]
     cnn_df = pd.DataFrame({'train_accuracy':[],'validation_accuracy':[],'test_accuracy':[],'dropout':[], 'kernel_size_layer1':[],'kernel_size_layer2':[],'kernel_size_layer3':[]})
@@ -336,7 +275,7 @@ if len(args) == 2 and args[0] == "CNN" and args[1] == "HPLoop":
     for i, saveName in enumerate(saveNamesCNN):
         with open(saveName, 'rb') as f:
             data[i] = np.load(f)
-    print('starting CNN')
+    print('starting CNN with HPLoop')
     dropouts = [.2,.25,.3]
     kernel_sizes = [[5,3],[4,4],[5,5]]
     for d in dropouts:
@@ -346,22 +285,27 @@ if len(args) == 2 and args[0] == "CNN" and args[1] == "HPLoop":
             cnn_df = cnn_df.append(df, ignore_index=True)
     cnn_df.to_csv('cnn_out.csv',index=False)
 
+#Do CNN, create visualization layers
+elif len(args) == 2 and args[0] == "CNN" and args[1] == "VisLayers":
+    data = [X_train, y_train, X_validate, y_validate, X_test, y_test] = [None, None, None, None, None, None]
+    print('Looking for data')
+    for i, saveName in enumerate(saveNamesCNN):
+        with open(saveName, 'rb') as f:
+            data[i] = np.load(f)
+    print('starting CNN with VisLayers')
+    CNN(data, enable_feature_extraction=True)
+
+#Just do CNN
 elif len(args) == 2 and args[0] == "CNN":
     data = [X_train, y_train, X_validate, y_validate, X_test, y_test] = [None, None, None, None, None, None]
     print('Looking for data')
     for i, saveName in enumerate(saveNamesCNN):
-        with open(args[1] + saveName, 'rb') as f:
+        with open(saveName, 'rb') as f:
             data[i] = np.load(f)
     print('starting CNN')
     CNN(data)
-elif len(args) == 3 and args[0] == "CNN" and args[2] == "VisLayers":
-    data = [X_train, y_train, X_validate, y_validate, X_test, y_test] = [None, None, None, None, None, None]
-    print('Looking for data')
-    for i, saveName in enumerate(saveNamesCNN):
-        with open(args[1] + saveName, 'rb') as f:
-            data[i] = np.load(f)
-    print('starting CNN')
-    CNN(data, enable_feature_extraction=True)
+
+#Just do CNN
 elif len(args) == 1 and args[0] == "CNN":
     data = [X_train, y_train, X_validate, y_validate, X_test, y_test] = [None, None, None, None, None, None]
     print('Looking for data')
@@ -370,20 +314,8 @@ elif len(args) == 1 and args[0] == "CNN":
             data[i] = np.load(f)
     print('starting CNN')
     CNN(data)
-elif len(args) == 1 and args[0] == "CNN_Transfer":
-    CNN_Transfer_Learn()
-    
 
-elif len(args) == 2 and args[0] == "KNN" and args[1] == "NoPlotUI":
-    matplotlib.use('Agg') # no UI backend
-    data = [X_train, y_train, X_validate, y_validate, X_test, y_test] = [None, None, None, None, None, None]
-    print('Looking for data')
-    for i, saveName in enumerate(saveNamesKNN):
-        with open(saveName, 'rb') as f:
-            data[i] = np.load(f)
-    n = 10
-    print('starting KNN with',n,"neighbors...")
-    KNN(data, num_neighbors=n, havePlotUI=False)
+#Run KNN with HyperTweak and NoPlotUI (for Adam's configuration)
 elif len(args) > 3 and args[0] == "KNN" and args[1] == "HyperTweak" and args[2] == "NoPlotUI":
     matplotlib.use('Agg') # no UI backend
     n_neighbors_list = [int(n) for n in args[3:]]
@@ -394,14 +326,41 @@ elif len(args) > 3 and args[0] == "KNN" and args[1] == "HyperTweak" and args[2] 
             data[i] = np.load(f)
     print("Running KNN hyperparameter tweaking loop...")
     for n in n_neighbors_list:
-        print('starting KNN with',n,"neighbors...")
+        print('starting KNN+HyperTweak with',n,"neighbors...")
         KNN(data, saveNamesKNN, num_neighbors=n, havePlotUI=False)
 
+#Run KNN with NoPlotUI (for Adam's configuration)
+elif len(args) == 2 and args[0] == "KNN" and args[1] == "NoPlotUI":
+    matplotlib.use('Agg') # no UI backend
+    data = [X_train, y_train, X_validate, y_validate, X_test, y_test] = [None, None, None, None, None, None]
+    print('Looking for data')
+    for i, saveName in enumerate(saveNamesKNN):
+        with open(saveName, 'rb') as f:
+            data[i] = np.load(f)
+    n = 10
+    print('starting KNN with',n,"neighbors...")
+    KNN(data, num_neighbors=n, havePlotUI=False)
+
+#Just do KNN
+if len(args) == 1 and args[0] == "KNN":
+    data = [X_train, y_train, X_validate, y_validate, X_test, y_test] = [None, None, None, None, None, None]
+    print('Looking for data')
+    for i, saveName in enumerate(saveNamesKNN):
+        with open(saveName, 'rb') as f:
+            data[i] = np.load(f)
+    n = 10
+    print('starting KNN with',n,"neighbors...")
+    KNN(data, num_neighbors=n)
+
+#Convert Data to numpy files
 elif len(args) == 1 and args[0] == 'csvToNpy':
         ConvertToNpy(saveNamesCNN)
 
+#Convert Data to numpy files with dimensionality reduction
 elif len(args) == 1 and args[0] == 'DimReduce':
         ConvertToNpy(saveNamesKNN,reduce=True)
+
+#Error      
 else:
-    print("Invalid arguments. Please view training.py for argument options.")
+    print("Invalid arguments. Please view step06_training.py for argument options.")
     print('Your arguments:',args)
