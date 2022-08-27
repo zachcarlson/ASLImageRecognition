@@ -103,6 +103,27 @@ python .\step01_VideoSplitPreProcess.py
 ```
 python .\step02_CropPreProcess.py
 ```
+6. Running the following command will convert the images to grayscale.  These images will be saved in a new folder `gray_frames`:
+```
+python .\step03_GrayscalePreProcess.py
+```
+7. Running the following command will import all images per class and save them into one single `.csv`.  These `.csv` files will be saved in a newly created folder `csv_files`.  *After `step04_CSVConversionPreProcess.py` has completed, you will have all necessary files to run the `ASLImageRecognition.ipynb` Notebook, if you wish.*
+```
+python .\step04_CSVConversionPreProcess.py
+```
+8. Running the following command will produce the EDA figures for this project:
+```
+python .\step05_EDA.py
+```
+9. Running the following command will do training:
+```
+python .\step06_training.py
+```
+10. Running the following command will produce images specifically transfer learning:
+```
+python .\step07_split_images.py
+```
+
 - Run each `.py` script.  After completing `step04_CSVConversionPreProcess.py`, it will be possible to run `ASLImageRecognition.ipynb`.
 
 ## Known Limitations of Project:
