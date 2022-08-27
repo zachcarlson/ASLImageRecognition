@@ -14,21 +14,29 @@ def CSV_To_DF(path):
     if len(files) > 1:
         print('This script expects only one file per class directory. More than one file was detected. ')
         return None
-    return pd.read_csv(path+files[0])
+    return pd.read_csv(path+files[0], header=None)
 
 def DF_To_Image(df, image_num):
-    df = df.iloc[:, 1:] #remove labels column
     image = df.iloc[image_num, :]
     image = image.to_numpy().reshape(224, 224)
     return image
 
-def FeatureMeansPerClass(inpath):
-    dirs = os.listdir(inpath)
+def FeatureMeansPerClass(csvDir="", figureDir=""):
+    if not os.path.exists(csvDir):
+        print('No CSV directory found.')
+        return
+    os.makedirs(os.path.dirname(figureDir), exist_ok=True)
+    
+    
+    dirs = os.listdir(csvDir)
+
     for d in dirs:
-        df = CSV_To_DF(inpath+d+'/')
+        df = CSV_To_DF(csvDir+d+'/')
+
         if df is None:
             print('Error encountered, script terminated.')
             return
+        df = df.iloc[:, 1:] #drop the labels (first column)
         feature_means = df.mean(axis=0,numeric_only=True)
         fig, ax = plt.subplots(1, 3, figsize=(15,10))
         plt.gray()
@@ -43,18 +51,14 @@ def FeatureMeansPerClass(inpath):
         ax[1].set_title(d+' Means Image')
         ax[2].set_title(d+' Class Feature Means')
         plt.gray() #show images as grayscale
-        fig.savefig(d+'_FeatureMeans')  #savefig, don't show
+        fig.savefig(figureDir+d+'_FeatureMeans.png')  #savefig, don't show
         fig.clear()
         plt.close(fig)
 
 
 args = sys.argv
-if len(args) > 1:
-    if args[1] == 'FeatureMeansPerClass':
-        if len(args) == 3:
-            FeatureMeansPerClass(args[2])
-        else:
-            print('FeatureMeansPerClass needs one argument -- the relative directory to traverse for subdirectory CSVs')
+if len(args) < 2:
+    FeatureMeansPerClass(csvDir="csv_files/", figureDir="figures/")
 else:
     print('not enough arguments')
     print('Try:')
