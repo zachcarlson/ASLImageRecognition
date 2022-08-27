@@ -4,7 +4,7 @@ __pycache__/
 *$py.class
 
 #CSV
-/CSV_Files
+/csv_files
 **/*.CSV
 **/*.csv
 
@@ -19,6 +19,10 @@ __pycache__/
 **/*.JPG
 **/*.jpeg
 **/*.JPEG
+
+#videos
+/Videos
+**/*.mp4
 
 #zip files
 *.zip
