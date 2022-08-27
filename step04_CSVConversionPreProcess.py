@@ -58,7 +58,7 @@ def LaunchConvert(subdirectories=True, inpath="gray_frames/", outpath="CSV_Files
             print("Converting image files in directory:", inpath + d + '/')
             ConvertImagesToCSV(inpath + d + '/', outpath + d + '/',label=i, fromGrey = grey)
     else:
-        ConvertImagesToCSV(inpath, outpath, fromGrey)
+        ConvertImagesToCSV(inpath, outpath, fromGrey = grey)
 
 
 args = sys.argv
