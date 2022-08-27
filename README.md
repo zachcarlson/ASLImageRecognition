@@ -81,7 +81,18 @@ Our team consisted of the following individuals (alphabetized by last name):
 
 ## How to Execute Notebook: 
 
-- Access the videos linked in **Project Requirements**, or create your own 30 second `.mp4` clips for each letter.  
+1. Download repository.
+2. Access the videos linked in **Project Requirements**, or create your own 30 second `.mp4` clips for each letter.  Add these videos to the repository with the following file organization:
+```
+  /ASLImageRecognition
+    /Videos
+      /A
+        A.mp4
+      /B
+        B.mp4
+      ..
+```
+- Add the following empty folders to the root repository directory:  `uncropped_frames`
 - Ensure you have the correct folder organization.  For example, `step02_CropPreProcess.py` expects an "uncropped" directory in the working directory with images to be cropped.  
 - Run each `.py` script.  After completing `step04_CSVConversionPreProcess.py`, it will be possible to run `ASLImageRecognition.ipynb`.
 
