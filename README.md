@@ -78,6 +78,7 @@ Our team consisted of the following individuals (alphabetized by last name):
   - `pandas`
   - `PIL.Image`, `PIL.ImageOps`
   - `sys`
+  - `VGG16`
 
 
 ## How to Execute Notebook: 
@@ -115,16 +116,27 @@ python .\step04_CSVConversionPreProcess.py
 ```
 python .\step05_EDA.py
 ```
-9. Running the following command will do training:
+9. Running the following two commands will generate the required numpy files for KNN and then run KNN:
 ```
-python .\step06_training.py
+python .\step06_training.py DimReduce
 ```
-10. Running the following command will produce images specifically transfer learning:
+```
+python .\step06_training.py KNN HyperTweak NoPlotUI 3 5 10 15 20 30 40 50
+```
+10. Running the following two commands will generate the required numpy files for CNN and then run CNN:
+```
+python .\step06_training.py csvToNpy
+```
+```
+python .\step06_training.py CNN
+```
+11. Running the following command will run Transfer Learning CNN:
 ```
 python .\step07_split_images.py
 ```
-
-- Run each `.py` script.  After completing `step04_CSVConversionPreProcess.py`, it will be possible to run `ASLImageRecognition.ipynb`.
+```
+python .\step06_training.py CNN_Transfer
+```
 
 ## Known Limitations of Project:
 - **ASL is not universal**.  ASL differs from other English-speaking countries, with the existence of British Sign Language.  Because of this, this project can only serve those who know ASL.
