@@ -94,16 +94,15 @@ Our team consisted of the following individuals (alphabetized by last name):
       ..
 ```
 3.  Open a terminal window in your preferred Python IDE, we recommend [Visual Studio Code](https://code.visualstudio.com/).  
-4.  From the Terminal Window, run the following scripts:
 
-Split videos into images.
+4.  Running the following command will split the `.mp4` in `/Videos` into images.  They'll be saved in a new created folder `uncropped_frames`:
 ```
-PS C:\...\ImageRecognition>  python .\step01_VideoSplitPreProcess.py
+python .\step01_VideoSplitPreProcess.py
 ```
-
-
-- Add the following empty folders to the root repository directory:  `uncropped_frames`
-- Ensure you have the correct folder organization.  For example, `step02_CropPreProcess.py` expects an "uncropped" directory in the working directory with images to be cropped.  
+5. Running the following command will crop the images from 1080x1920 pixels to 224x224 pixels.  These images will be saved in a new folder `cropped_frames`:
+```
+python .\step02_CropPreProcess.py
+```
 - Run each `.py` script.  After completing `step04_CSVConversionPreProcess.py`, it will be possible to run `ASLImageRecognition.ipynb`.
 
 ## Known Limitations of Project:
