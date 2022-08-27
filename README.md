@@ -78,6 +78,7 @@ Our team consisted of the following individuals (alphabetized by last name):
   - `pandas`
   - `PIL.Image`, `PIL.ImageOps`
   - `sys`
+  - `VGG16`
 
 
 ## How to Execute Notebook: 
@@ -122,14 +123,14 @@ python .\step06_training.py DimReduce
 ```
 python .\step06_training.py KNN HyperTweak NoPlotUI 3 5 10 15 20 30 40 50
 ```
-9. Running the following two commands will generate the required numpy files for CNN and then run CNN:
+10. Running the following two commands will generate the required numpy files for CNN and then run CNN:
 ```
 python .\step06_training.py csvToNpy
 ```
 ```
 python .\step06_training.py CNN
 ```
-10. Running the following command will run Transfer Learning CNN:
+11. Running the following command will run Transfer Learning CNN:
 ```
 python .\step07_split_images.py
 ```
