@@ -63,7 +63,7 @@ def LaunchConvert(subdirectories=True, inpath="gray_frames/", outpath="CSV_Files
 
 args = sys.argv
 if len(args) < 2:
-    LaunchConvert(subdirectories=True, inpath="gray_frames/", outpath="CSV_Files/", grey = True)
+    LaunchConvert(subdirectories=True, inpath="gray_frames/", outpath="csv_files/", grey = True)
 elif len(args) < 5:
     print(
         "Not enough arguments. Please provide: 1)subdirectories (boolean), 2)inpath (relative to working directory, ending in /), 3)outpath (ending in /), 4)from greyscale images bool")
