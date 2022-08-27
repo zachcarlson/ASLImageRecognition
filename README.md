@@ -82,10 +82,10 @@ Our team consisted of the following individuals (alphabetized by last name):
 
 ## How to Execute Notebook: 
 
-**NOTE:** These instructions are for Windows.  You may need to modify the scripts for Mac.
+**NOTE:** These instructions are for Windows.  You may need to modify the commands for Mac.
 
 1. Download repository.
-2. Access the videos linked in **Project Requirements**, or create your own 30 second `.mp4` clips for each letter (excluding J and Z).  Add these videos to the repository with the following file organization:
+2. Download the videos stored [here](https://drive.google.com/drive/folders/1JfsDvx-Aq5ppHAef4y6wsKiAlfmYYm6V?usp=sharing).  We recommend downloading the zip of `Videos`, unzipping it, and adding it to the repository.  You can also create your own 30 second `.mp4` clips for each letter (excluding J and Z).  Add these videos to the repository with the following file organization:
 ```
   /ASLImageRecognition
     /Videos
