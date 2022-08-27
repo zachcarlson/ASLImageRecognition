@@ -95,23 +95,23 @@ Our team consisted of the following individuals (alphabetized by last name):
 ```
 3.  Open a terminal window in your preferred Python IDE, we recommend [Visual Studio Code](https://code.visualstudio.com/).  The current working directory should be `/ImageRecognition` for all following commands.
 
-4.  Running the following command will split the `.mp4` in `/Videos` into images.  They'll be saved in a new created folder `uncropped_frames`:
+4.  Running the following command will split the `.mp4` in `/Videos` into images.  They'll be saved in `uncropped_frames`:
 ```
 python .\step01_VideoSplitPreProcess.py
 ```
-5. Running the following command will crop the images from 1080x1920 pixels to 224x224 pixels.  These images will be saved in a new folder `cropped_frames`:
+5. Running the following command will crop the images from 1080x1920 pixels to 224x224 pixels.  These images will be saved in `cropped_frames`:
 ```
 python .\step02_CropPreProcess.py
 ```
-6. Running the following command will convert the images to grayscale.  These images will be saved in a new folder `gray_frames`:
+6. Running the following command will convert the images to grayscale.  These images will be saved in `gray_frames`:
 ```
 python .\step03_GrayscalePreProcess.py
 ```
-7. Running the following command will import all images per class and save them into one single `.csv`.  These `.csv` files will be saved in a newly created folder `csv_files`.  *After `step04_CSVConversionPreProcess.py` has completed, you will have all necessary files to run the `ASLImageRecognition.ipynb` Notebook, if you wish.*
+7. Running the following command will import all images per class and save them into one single `.csv`.  These `.csv` files will be saved in `csv_files`.  *After `step04_CSVConversionPreProcess.py` has completed, you will have all necessary files to run the `ASLImageRecognition.ipynb` Notebook, if you wish.*
 ```
 python .\step04_CSVConversionPreProcess.py
 ```
-8. Running the following command will produce the EDA figures for this project:
+8. Running the following command will produce the EDA figures for this project, which will be saved in `figures`:
 ```
 python .\step05_EDA.py
 ```
