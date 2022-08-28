@@ -116,25 +116,31 @@ python .\step04_CSVConversionPreProcess.py
 ```
 python .\step05_EDA.py
 ```
-9. Running the following two commands will generate the required numpy files for KNN (and save these in `numpy_files`) and then run KNN:
+9. Running the following command will generate the required numpy files for KNN (and save these in `numpy_files`):
 ```
 #create numpy files for KNN
 python .\step06_training.py DimReduce
 ```
-```
-#Run KNN with k=3, 5, 10, 15, 20, 30, 40, 50
-python .\step06_training.py KNN HyperTweak 3 5 10 15 20 30 40 50
-```
-10. Running the following two commands will generate the required numpy files for CNN (and save these in `numpy_files`) and then run CNN:
+10.  Running the following command will generate the required numpy files for CNN (and save these in `numpy_files`):
 ```
 #create numpy files for CNN
 python .\step06_training.py csvToNpy
 ```
+11.  Now that the required numpy files are made, you can run the first two models.  There are several options for KNN to tune the value of K.  Some examples are below:
 ```
-#run CNN
+#Run KNN with default K=10
+python .\step06_training.py KNN
+
+#Run KNN with K=3, 5, 10, 15, 20, 30, 40, 50
+python .\step06_training.py KNN HyperTweak 3 5 10 15 20 30 40 50
+
+```
+12.  Use the following command to run CNN:
+
+```
 python .\step06_training.py CNN
 ```
-11. Running the following command will run Transfer Learning CNN:
+13. Running the following command will run Transfer Learning CNN:
 ```
 python .\step07_split_images.py
 ```
