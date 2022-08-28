@@ -130,7 +130,7 @@ def ConvertToNpy(saveNames, numpyDir="", reduce = False):
     data = [X_train, y_train, X_validate, y_validate, X_test, y_test]
     for i in range(len(saveNames)):
         print("Saving", saveNames[i], "...")
-        with open(saveNames[i], 'wb') as f:
+        with open('numpy_files/'+saveNames[i], 'wb') as f:
             np.save(numpyDir+saveNames[i], data[i])
 
 def KNN(data, num_neighbors = 3, havePlotUI=True):
@@ -267,7 +267,7 @@ def CNN_Transfer_Learn(num_epochs=4, haveUI = False):#original: 10 epochs
     if haveUI:
         plt.show()
     else:
-        plt.savefig("cnn_transfer_loss")  #savefig, don't show
+        plt.savefig("figures/cnn_transfer_loss.png")  #savefig, don't show
     plt.cla()
     plt.close()
     #accuracy plots
@@ -277,7 +277,7 @@ def CNN_Transfer_Learn(num_epochs=4, haveUI = False):#original: 10 epochs
     if haveUI:
         plt.show()
     else:
-        plt.savefig("cnn_transfer_accuracy")  #savefig, don't show
+        plt.savefig("figures/cnn_transfer_accuracy.png")  #savefig, don't show
     plt.cla()
     plt.close()
     print("Calculating prediction accuracy on test set...")
@@ -291,6 +291,7 @@ def plot_confusion_matrix(cm, classes, hyperparameter,
                           title='Confusion matrix',
                           cmap=plt.cm.Blues, haveUI=True):
     '''Plot a confusion matrix for the KNN'''
+    plt.clf() #reset plot
     plt.imshow(cm, interpolation='nearest', cmap=cmap)
     plt.title(title)
     plt.colorbar()
@@ -316,7 +317,7 @@ def plot_confusion_matrix(cm, classes, hyperparameter,
     if haveUI:
         plt.show()
     else:
-        plt.savefig("KNN "+hyperparameter)  #savefig, don't show
+        plt.savefig("figures/KNN_"+hyperparameter)  #savefig, don't show
     plt.figure().clear()
     plt.close()
 
@@ -347,7 +348,7 @@ if len(args) == 2 and args[0] == "CNN" and args[1] == "HPLoop":
     cnn_df = pd.DataFrame({'train_accuracy':[],'validation_accuracy':[],'test_accuracy':[],'dropout':[], 'kernel_size_layer1':[],'kernel_size_layer2':[],'kernel_size_layer3':[]})
     print('Looking for data')
     for i, saveName in enumerate(saveNamesCNN):
-        with open(saveName, 'rb') as f:
+        with open('numpy_files/'+saveName, 'rb') as f:
             data[i] = np.load(f)
     print('starting CNN')
     dropouts = [.2,.25,.3]
@@ -359,22 +360,12 @@ if len(args) == 2 and args[0] == "CNN" and args[1] == "HPLoop":
             cnn_df = cnn_df.append(df, ignore_index=True)
     cnn_df.to_csv('cnn_out.csv',index=False)
 
-#Run CNN, assumes numpy files are made
-elif len(args) == 2 and args[0] == "CNN":
-    data = [X_train, y_train, X_validate, y_validate, X_test, y_test] = [None, None, None, None, None, None]
-    print('Looking for data')
-    for i, saveName in enumerate(saveNamesCNN):
-        with open(args[1] + saveName, 'rb') as f:
-            data[i] = np.load(f)
-    print('starting CNN')
-    CNN(data)
-
 #Run CNN with VisLayers, assumes numpy files are made
-elif len(args) == 3 and args[0] == "CNN" and args[2] == "VisLayers":
+elif len(args) == 2 and args[0] == "CNN" and args[2] == "VisLayers":
     data = [X_train, y_train, X_validate, y_validate, X_test, y_test] = [None, None, None, None, None, None]
     print('Looking for data')
     for i, saveName in enumerate(saveNamesCNN):
-        with open('/numpy_files/' + saveName, 'rb') as f:
+        with open('numpy_files/'+saveName, 'rb') as f:
             data[i] = np.load(f)
     print('starting CNN')
     CNN(data, enable_feature_extraction=True)
@@ -399,25 +390,51 @@ elif len(args) == 2 and args[0] == "KNN" and args[1] == "NoPlotUI":
     data = [X_train, y_train, X_validate, y_validate, X_test, y_test] = [None, None, None, None, None, None]
     print('Looking for data')
     for i, saveName in enumerate(saveNamesKNN):
-        with open(saveName, 'rb') as f:
+        with open('numpy_files/'+saveName, 'rb') as f:
             data[i] = np.load(f)
     n = 10
     print('starting KNN with',n,"neighbors...")
     KNN(data, num_neighbors=n, havePlotUI=False)
 
-#Runs KNN with HyperTweak and NoPlotUI (Linux users), assumes numpy files are made
+#Runs KNN with NoPlotUI (for Linux users), assumes numpy files are made
+elif len(args) == 2 and args[0] == "KNN" and args[1] == "NoPlotUI":
+    matplotlib.use('Agg') # no UI backend
+    data = [X_train, y_train, X_validate, y_validate, X_test, y_test] = [None, None, None, None, None, None]
+    print('Looking for data')
+    for i, saveName in enumerate(saveNamesKNN):
+        with open('numpy_files/'+saveName, 'rb') as f:
+            data[i] = np.load(f)
+    n = 10
+    print('starting KNN with',n,"neighbors...")
+    KNN(data, num_neighbors=n, havePlotUI=False)
+
+#Runs KNN with HyperTweak and NoPlotUI and any number of K (Linux users), assumes numpy files are made
 elif len(args) > 3 and args[0] == "KNN" and args[1] == "HyperTweak" and args[2] == "NoPlotUI":
     matplotlib.use('Agg') # no UI backend
     n_neighbors_list = [int(n) for n in args[3:]]
     data = [X_train, y_train, X_validate, y_validate, X_test, y_test] = [None, None, None, None, None, None]
     print('Looking for data')
     for i, saveName in enumerate(saveNamesKNN):
-        with open(saveName, 'rb') as f:
+        with open('numpy_files/'+saveName, 'rb') as f:
             data[i] = np.load(f)
     print("Running KNN hyperparameter tweaking loop...")
     for n in n_neighbors_list:
         print('starting KNN with',n,"neighbors...")
-        KNN(data, saveNamesKNN, num_neighbors=n, havePlotUI=False)
+        KNN(data, saveNamesKNN, num_neighbors=int(n), havePlotUI=False)
+
+#Runs KNN with HyperTweak and any number of K, assumes numpy files are made
+elif len(args) >= 3 and args[0] == "KNN" and args[1] == "HyperTweak":
+    matplotlib.use('Agg') # no UI backend
+    n_neighbors_list = [int(n) for n in args[2:]]
+    data = [X_train, y_train, X_validate, y_validate, X_test, y_test] = [None, None, None, None, None, None]
+    print('Looking for data')
+    for i, saveName in enumerate(saveNamesKNN):
+        with open('numpy_files/'+saveName, 'rb') as f:
+            data[i] = np.load(f)
+    print("Running KNN hyperparameter tweaking loop...")
+    for n in n_neighbors_list:
+        print('starting KNN with',n,"neighbors...")
+        KNN(data, num_neighbors=n, havePlotUI=False)
 
 #Converts CSV files to numpy files for CNN.
 elif len(args) == 1 and args[0] == 'csvToNpy':
