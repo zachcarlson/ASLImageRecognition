@@ -155,10 +155,11 @@ python .\step06_training.py CNN VisLayers
 # NOTE: this command requires a lot of RAM memory.  Edit the parameter options on line 396 and 397 to reduce space required
 python .\step06_training.py CNN HPLoop
 ```
-13. Running the following command will run Transfer Learning CNN:
+13. **Copy Images for Transfer CNN.**  Transfer CNN requires images for training, testing, and validation are in different folders.  Running the following command will reconfigure image organization:
 ```
 python .\step07_split_images.py
 ```
+14. **Run Transfer CNN.** The following command will run Transfer CNN:
 ```
 python .\step06_training.py CNN_Transfer
 ```
