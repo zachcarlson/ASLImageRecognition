@@ -114,7 +114,7 @@ python .\step03_GrayscalePreProcess.py
 ```
 python .\step04_CSVConversionPreProcess.py
 ```
-8. **Create EDA visualizations.** Running the following command will produce the EDA figures for this project, which will be saved in `figures`:
+8. **Create EDA visualizations.** Running the following command will produce the EDA figures for this project, which will be saved in `figures/FeatureMeansSummary`:
 ```
 python .\step05_EDA.py
 ```
@@ -128,7 +128,7 @@ python .\step06_training.py DimReduce
 #create numpy files for CNN
 python .\step06_training.py csvToNpy
 ```
-11.  **Run KNN.** Now that the required numpy files are made, you can run the first two models.  There are several options for KNN to tune the value of K.  *If you want to run KNN on more than one K value you must include `HyperTweak` in your command.*  Some examples are below:
+11.  **Run KNN.** Now that the required numpy files are made, you can run the first two models.  There are several options for KNN to tune the value of K.  *If you want to run KNN on more than one K value you must include `HyperTweak` in your command.*  Regardless of the option you select, confusion matrix figures will be saved in `figures/knn` Some examples are below:
 ```
 #Run KNN with default K=10
 python .\step06_training.py KNN
@@ -137,14 +137,14 @@ python .\step06_training.py KNN
 python .\step06_training.py KNN HyperTweak 3 5 10 15 20 30 40 50
 
 ```
-12.  **Run CNN.** There are several optoins for CNN to tune various hyperparameters:
+12.  **Run CNN.** If `VisLayers` is selected, figures will be saved in `figures/cnn_layers`.  There are several optoins for CNN to tune various hyperparameters:
 
 ```
 #runs CNN with default values of epochs=10, kernel_size=[5,3], dropout=0.2, strides=[5,3] 
 #NOTE: First kernel_size and stride values are used in the first convolutional layer, the second values are used in the second convolutional layer.
 python .\step06_training.py CNN
 
-#runs CNN with default values and outputs feature map visualizations
+#runs CNN with default values and outputs feature map visualizations, saved in figures/cnn_layers
 python .\step06_training.py CNN VisLayers
 
 #runs CNN with hyperparameter loops.  Uses epochs=10, kernel_sizes=[[5,3],[4,4]], dropouts=[.2,.25], strides=[5,3] 
