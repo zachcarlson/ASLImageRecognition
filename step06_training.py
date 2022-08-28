@@ -165,14 +165,17 @@ def visualize_cnn_layers(img, cnn_model):
     activation_model = keras.models.Model(inputs=cnn_model.input, outputs=layer_outputs)
     activations = activation_model.predict(tensor_image)
 
+    os.makedirs(os.path.dirname('figures/cnn/cnn_layers/'), exist_ok=True)
+
     for x, act in enumerate(activations):
         channel1 = 6
         channel2 = 15
         plt.matshow(act[0, :, :, channel1], cmap='viridis')
         plt.title(important_layer_names[x] + ' channel ' + str(channel1))
+        plt.savefig('figures/cnn/cnn_layers/'+important_layer_names[x] + ' channel ' + str(channel1)+'.png')
         plt.matshow(act[0, :, :, channel2], cmap='viridis')
         plt.title(important_layer_names[x] + ' channel ' + str(channel2))
-    plt.show()
+        plt.savefig('figures/cnn/cnn_layers/'+important_layer_names[x] + ' channel ' + str(channel2)+'.png')
 
 def CNN(data, epochs=10, kernel_size=[5,3], dropout=.20, strides=[5,3], enable_feature_extraction=False):
     '''Run CNN'''
@@ -230,9 +233,14 @@ def CNN(data, epochs=10, kernel_size=[5,3], dropout=.20, strides=[5,3], enable_f
 
 def CNN_Transfer_Learn(num_epochs=4, haveUI = False):#original: 10 epochs
     '''Run CNN Transfer Learning'''
+    #create output directory if it doesn't exist
+    os.makedirs(os.path.dirname('figures/cnn'), exist_ok=True)
+
     if haveUI == False:
         matplotlib.use('Agg') # no UI backend
+
     from tensorflow.keras.preprocessing.image import ImageDataGenerator
+
     train_path = 'split_images/train_images'
     valid_path = 'split_images/val_images'
     test_path = 'split_images/test_images'
@@ -265,20 +273,14 @@ def CNN_Transfer_Learn(num_epochs=4, haveUI = False):#original: 10 epochs
     plt.plot(history.history['loss'], label='train loss')
     plt.plot(history.history['val_loss'], label='val loss')
     plt.legend()
-    if haveUI:
-        plt.show()
-    else:
-        plt.savefig("figures/cnn_transfer_loss.png")  #savefig, don't show
+    plt.savefig("figures/cnn/cnn_transfer_loss.png")  #savefig, don't show
     plt.cla()
     plt.close()
     #accuracy plots
     plt.plot(history.history['accuracy'], label='train acc')
     plt.plot(history.history['val_accuracy'], label='val acc')
     plt.legend()
-    if haveUI:
-        plt.show()
-    else:
-        plt.savefig("figures/cnn_transfer_accuracy.png")  #savefig, don't show
+    plt.savefig("figures/cnn/cnn_transfer_accuracy.png")  #savefig, don't show
     plt.cla()
     plt.close()
     print("Calculating prediction accuracy on test set...")
@@ -292,6 +294,9 @@ def plot_confusion_matrix(cm, classes, hyperparameter,
                           title='Confusion matrix',
                           cmap=plt.cm.Blues, haveUI=True):
     '''Plot a confusion matrix for the KNN'''
+    os.makedirs(os.path.dirname('figures/knn/'), exist_ok=True)
+
+
     plt.clf() #reset plot
     plt.imshow(cm, interpolation='nearest', cmap=cmap)
     plt.title(title)
@@ -315,10 +320,7 @@ def plot_confusion_matrix(cm, classes, hyperparameter,
     plt.tight_layout()
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
-    if haveUI:
-        plt.show()
-    else:
-        plt.savefig("figures/KNN_"+hyperparameter)  #savefig, don't show
+    plt.savefig("figures/knn/KNN_"+hyperparameter+'.png')
     plt.figure().clear()
     plt.close()
 
