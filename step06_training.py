@@ -63,6 +63,7 @@ from sklearn.random_projection import johnson_lindenstrauss_min_dim
 import sys
 from PIL import Image as im
 print(f"Using keras version: {keras.__version__}")
+
 ######################SET VARIABLES, RANDOM STATE
 process = 'Apply label to samples'
 csv_files_path = "csv_files/"
@@ -214,10 +215,10 @@ def CNN(data, epochs=10, kernel_size=[5,3], dropout=.20, strides=[5,3], enable_f
     cnn_model.fit(X_train, y_train, validation_data=(X_validate, y_validate), epochs=epochs, callbacks=[callback])
 
     train_predictions = cnn_model.predict(X_train)
-    train_acc = accuracy_score(y_train, np.argmax(train_predictions, axis=1))
+    train_acc = accuracy_score(np.argmax(y_train, axis=1), np.argmax(train_predictions, axis=1))
 
     val_predictions = cnn_model.predict(X_validate)
-    val_acc = accuracy_score(y_validate, np.argmax(val_predictions, axis=1))
+    val_acc = accuracy_score(np.argmax(y_validate, axis=1), np.argmax(val_predictions, axis=1))
 
 
     test_predictions = cnn_model.predict(X_test)
@@ -322,7 +323,8 @@ def plot_confusion_matrix(cm, classes, hyperparameter,
     plt.close()
 
 ###########################################################################################
-args = sys.argv
+args = ['step06_training.py', 'CNN']
+#args = sys.argv
 
 saveNamesKNN=["X_train_reduced.npy","y_train_reduced.npy","X_validation_reduced.npy","y_validation_reduced.npy","X_test_reduced.npy","y_test_reduced.npy"]
 saveNamesCNN=["X_train.npy","y_train.npy","X_validation.npy","y_validation.npy","X_test.npy","y_test.npy"]
@@ -331,7 +333,7 @@ saveNamesCNN=["X_train.npy","y_train.npy","X_validation.npy","y_validation.npy",
 if('step06_training.py' in args[0]):
     args = args[1:]
 
-#Run KNN, assumes numpy files are made
+#Run KNN with default k=10, assumes numpy files are made
 if len(args) == 1 and args[0] == "KNN":
     data = [X_train, y_train, X_validate, y_validate, X_test, y_test] = [None, None, None, None, None, None]
     print('Looking for data')
@@ -358,7 +360,9 @@ if len(args) == 2 and args[0] == "CNN" and args[1] == "HPLoop":
             results = CNN(data,epochs=10, kernel_size=ks, dropout=d)
             df = pd.DataFrame({'train_accuracy':[results[0]],'validation_accuracy':[results[1]],'test_accuracy':[results[2]],'dropout':[d],'kernel_size_layer1':[ks[0]],'kernel_size_layer2':[ks[1]],'kernel_size_layer3':[ks[2]]})
             cnn_df = cnn_df.append(df, ignore_index=True)
-    cnn_df.to_csv('cnn_out.csv',index=False)
+
+    os.makedirs(os.path.dirname('data/'), exist_ok=True)
+    cnn_df.to_csv('data/cnn_out.csv',index=False)
 
 #Run CNN with VisLayers, assumes numpy files are made
 elif len(args) == 2 and args[0] == "CNN" and args[2] == "VisLayers":
@@ -383,18 +387,6 @@ elif len(args) == 1 and args[0] == "CNN":
 #Run Transfer CNN, assumes step07_split.images.py has been run
 elif len(args) == 1 and args[0] == "CNN_Transfer":
     CNN_Transfer_Learn()
-    
-#Runs KNN with NoPlotUI (for Linux users), assumes numpy files are made
-elif len(args) == 2 and args[0] == "KNN" and args[1] == "NoPlotUI":
-    matplotlib.use('Agg') # no UI backend
-    data = [X_train, y_train, X_validate, y_validate, X_test, y_test] = [None, None, None, None, None, None]
-    print('Looking for data')
-    for i, saveName in enumerate(saveNamesKNN):
-        with open('numpy_files/'+saveName, 'rb') as f:
-            data[i] = np.load(f)
-    n = 10
-    print('starting KNN with',n,"neighbors...")
-    KNN(data, num_neighbors=n, havePlotUI=False)
 
 #Runs KNN with NoPlotUI (for Linux users), assumes numpy files are made
 elif len(args) == 2 and args[0] == "KNN" and args[1] == "NoPlotUI":
