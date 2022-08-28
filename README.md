@@ -10,7 +10,7 @@ Our project focused on American Sign Language (ASL).  The goal of this project w
 ## File Manifest: 
 - `Folder /data` - Contains all small data files
   - `letter_means_df.csv` - Mean pixel values for each letter
-- `Folder /documents` - Contains all reports as required for DSCI 591.
+- `Folder /documents` - Contains all reports as required for DSCI 591 and DSCI 592.
   - `Launch Report - Final Version.pdf` - PDF of first report for DSCI 591.
   - `DSCI 591 Data Acquisition and Pre-Processing Report.pdf` - PDF of second report for DSCI 591.
   - `DSCI 591 Exploratory Data Analytics Report.docx` - Third report for DSCI 591.
@@ -27,9 +27,7 @@ Our project focused on American Sign Language (ASL).  The goal of this project w
       - `cnn_transfer_accuracy.png` - Plot of training and validation accuracy across epochs for CNN.
       - `cnn_transfer_loss.png` - Plot of training and validation loss across epochs for CNN.
   - `Folder /knn` - Contains KNN confusion matrix for different values of k.
-      - `k_accuracy_plot.png` - Plot of K versus accuracy for KNN, done manually outside of project.
-
-
+    - `k_accuracy_plot.png` - Plot of K versus accuracy for KNN, done manually outside of project.
 - `Folder /CNN OUTPUT` - Contains performance outputs for CNN hyperparamater tuning.
 - `Folder /CNN TRANSFER OUTPUT` - Contains performance outputs for Transfer CNN.
 - `Folder /KNN OUTPUT` - Contains performance outputs for KNN.
@@ -39,7 +37,7 @@ Our project focused on American Sign Language (ASL).  The goal of this project w
 - `step03_GrayscalePreProcess.py` - Python script to convert images to grayscale
 - `step04_CSVConversionPreProcess.py` - Python script to convert grayscale images to CSV
 - `step05_EDA.py` - Python script to produce some EDA visualizations
-- `step06_training.py` - Python script for training of KNN and CNN (not for transfer CNN).
+- `step06_training.py` - Python script for training of KNN, CNN, and transfer-CNN.
 - `step07_split_images.py` - Python script to split and format images for transfer CNN.
 
 
