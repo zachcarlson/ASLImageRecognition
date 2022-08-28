@@ -152,7 +152,7 @@ python .\step06_training.py CNN
 python .\step06_training.py CNN VisLayers
 
 #runs CNN with hyperparameter loops.  Uses epochs=10, kernel_sizes=[[5,3],[4,4]], dropouts=[.2,.25], strides=[5,3] 
-# NOTE: this command requires a lot of RAM memory.  Edit the parameter options on line 396 and 397 to reduce space required
+# NOTE: this command requires a lot of RAM memory.  Edit the parameter options on lines 397-398 to reduce space required.
 python .\step06_training.py CNN HPLoop
 ```
 13. **Copy Images for Transfer CNN.**  Transfer CNN requires images for training, testing, and validation are in different folders.  Running the following command will reconfigure image organization:
