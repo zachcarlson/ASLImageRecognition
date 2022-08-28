@@ -126,7 +126,7 @@ python .\step06_training.py DimReduce
 #create numpy files for CNN
 python .\step06_training.py csvToNpy
 ```
-11.  Now that the required numpy files are made, you can run the first two models.  There are several options for KNN to tune the value of K.  Some examples are below:
+11.  Now that the required numpy files are made, you can run the first two models.  There are several options for KNN to tune the value of K.  *If you want to run KNN on more than one K value you must include `HyperTweak` in your command.*  Some examples are below:
 ```
 #Run KNN with default K=10
 python .\step06_training.py KNN
