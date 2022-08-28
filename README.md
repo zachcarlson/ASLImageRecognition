@@ -137,7 +137,7 @@ python .\step06_training.py KNN
 python .\step06_training.py KNN HyperTweak 3 5 10 15 20 30 40 50
 
 ```
-12.  **Run CNN.** If `VisLayers` is selected, figures will be saved in `figures/cnn_layers`.  There are several optoins for CNN to tune various hyperparameters:
+12.  **Run CNN.** If `VisLayers` is selected, figures will be saved in `figures/cnn/cnn_layers`.  There are several optoins for CNN to tune various hyperparameters:
 
 ```
 #runs CNN with default values of epochs=10, kernel_size=[5,3], dropout=0.2, strides=[5,3] 
