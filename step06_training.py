@@ -53,7 +53,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 import pandas as pd
-import seaborn as sns
+from PIL import Image as im
 from sklearn.decomposition import PCA
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import confusion_matrix, multilabel_confusion_matrix , classification_report
@@ -61,7 +61,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.random_projection import johnson_lindenstrauss_min_dim
 import sys
-from PIL import Image as im
+
 print(f"Using keras version: {keras.__version__}")
 
 ######################SET VARIABLES, RANDOM STATE
@@ -323,8 +323,7 @@ def plot_confusion_matrix(cm, classes, hyperparameter,
     plt.close()
 
 ###########################################################################################
-args = ['step06_training.py', 'CNN']
-#args = sys.argv
+args = sys.argv
 
 saveNamesKNN=["X_train_reduced.npy","y_train_reduced.npy","X_validation_reduced.npy","y_validation_reduced.npy","X_test_reduced.npy","y_test_reduced.npy"]
 saveNamesCNN=["X_train.npy","y_train.npy","X_validation.npy","y_validation.npy","X_test.npy","y_test.npy"]
@@ -343,50 +342,6 @@ if len(args) == 1 and args[0] == "KNN":
     n = 10
     print('starting KNN with',n,"neighbors...")
     KNN(data, num_neighbors=n)
-
-#Run CNN with HPLoop, assumes numpy files are made
-if len(args) == 2 and args[0] == "CNN" and args[1] == "HPLoop":
-    data = [X_train, y_train, X_validate, y_validate, X_test, y_test] = [None, None, None, None, None, None]
-    cnn_df = pd.DataFrame({'train_accuracy':[],'validation_accuracy':[],'test_accuracy':[],'dropout':[], 'kernel_size_layer1':[],'kernel_size_layer2':[],'kernel_size_layer3':[]})
-    print('Looking for data')
-    for i, saveName in enumerate(saveNamesCNN):
-        with open('numpy_files/'+saveName, 'rb') as f:
-            data[i] = np.load(f)
-    print('starting CNN')
-    dropouts = [.2,.25,.3]
-    kernel_sizes = [[5,3],[4,4],[5,5]]
-    for d in dropouts:
-        for ks in kernel_sizes:
-            results = CNN(data,epochs=10, kernel_size=ks, dropout=d)
-            df = pd.DataFrame({'train_accuracy':[results[0]],'validation_accuracy':[results[1]],'test_accuracy':[results[2]],'dropout':[d],'kernel_size_layer1':[ks[0]],'kernel_size_layer2':[ks[1]],'kernel_size_layer3':[ks[2]]})
-            cnn_df = cnn_df.append(df, ignore_index=True)
-
-    os.makedirs(os.path.dirname('data/'), exist_ok=True)
-    cnn_df.to_csv('data/cnn_out.csv',index=False)
-
-#Run CNN with VisLayers, assumes numpy files are made
-elif len(args) == 2 and args[0] == "CNN" and args[2] == "VisLayers":
-    data = [X_train, y_train, X_validate, y_validate, X_test, y_test] = [None, None, None, None, None, None]
-    print('Looking for data')
-    for i, saveName in enumerate(saveNamesCNN):
-        with open('numpy_files/'+saveName, 'rb') as f:
-            data[i] = np.load(f)
-    print('starting CNN')
-    CNN(data, enable_feature_extraction=True)
-
-#Run CNN, assumes numpy files are made
-elif len(args) == 1 and args[0] == "CNN":
-    data = [X_train, y_train, X_validate, y_validate, X_test, y_test] = [None, None, None, None, None, None]
-    print('Looking for data')
-    for i, saveName in enumerate(saveNamesCNN):
-        with open('numpy_files/'+saveName, 'rb') as f:
-            data[i] = np.load(f)
-    print('starting CNN')
-    CNN(data)
-
-#Run Transfer CNN, assumes step07_split.images.py has been run
-elif len(args) == 1 and args[0] == "CNN_Transfer":
-    CNN_Transfer_Learn()
 
 #Runs KNN with NoPlotUI (for Linux users), assumes numpy files are made
 elif len(args) == 2 and args[0] == "KNN" and args[1] == "NoPlotUI":
@@ -427,6 +382,50 @@ elif len(args) >= 3 and args[0] == "KNN" and args[1] == "HyperTweak":
     for n in n_neighbors_list:
         print('starting KNN with',n,"neighbors...")
         KNN(data, num_neighbors=n, havePlotUI=False)
+
+#Run CNN with HPLoop, assumes numpy files are made
+elif len(args) == 2 and args[0] == "CNN" and args[1] == "HPLoop":
+    data = [X_train, y_train, X_validate, y_validate, X_test, y_test] = [None, None, None, None, None, None]
+    cnn_df = pd.DataFrame({'train_accuracy':[],'validation_accuracy':[],'test_accuracy':[],'dropout':[], 'kernel_size_layer1':[],'kernel_size_layer2':[],'kernel_size_layer3':[]})
+    print('Looking for data')
+    for i, saveName in enumerate(saveNamesCNN):
+        with open('numpy_files/'+saveName, 'rb') as f:
+            data[i] = np.load(f)
+    print('starting CNN')
+    dropouts = [.2,.25]
+    kernel_sizes = [[5,3],[4,4]]
+    for d in dropouts:
+        for ks in kernel_sizes:
+            results = CNN(data,epochs=10, kernel_size=ks, dropout=d)
+            df = pd.DataFrame({'train_accuracy':[results[0]],'validation_accuracy':[results[1]],'test_accuracy':[results[2]],'dropout':[d],'kernel_size_layer1':[ks[0]],'kernel_size_layer2':[ks[1]]})
+            cnn_df = cnn_df.append(df, ignore_index=True)
+
+    os.makedirs(os.path.dirname('data/'), exist_ok=True)
+    cnn_df.to_csv('data/cnn_out.csv',index=False)
+
+#Run CNN with VisLayers, assumes numpy files are made
+elif len(args) == 2 and args[0] == "CNN" and args[1] == "VisLayers":
+    data = [X_train, y_train, X_validate, y_validate, X_test, y_test] = [None, None, None, None, None, None]
+    print('Looking for data')
+    for i, saveName in enumerate(saveNamesCNN):
+        with open('numpy_files/'+saveName, 'rb') as f:
+            data[i] = np.load(f)
+    print('starting CNN')
+    CNN(data, enable_feature_extraction=True)
+
+#Run CNN, assumes numpy files are made
+elif len(args) == 1 and args[0] == "CNN":
+    data = [X_train, y_train, X_validate, y_validate, X_test, y_test] = [None, None, None, None, None, None]
+    print('Looking for data')
+    for i, saveName in enumerate(saveNamesCNN):
+        with open('numpy_files/'+saveName, 'rb') as f:
+            data[i] = np.load(f)
+    print('starting CNN')
+    CNN(data)
+
+#Run Transfer CNN, assumes step07_split.images.py has been run
+elif len(args) == 1 and args[0] == "CNN_Transfer":
+    CNN_Transfer_Learn()
 
 #Converts CSV files to numpy files for CNN.
 elif len(args) == 1 and args[0] == 'csvToNpy':
