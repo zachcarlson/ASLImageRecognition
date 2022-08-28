@@ -22,10 +22,14 @@ Our project focused on American Sign Language (ASL).  The goal of this project w
   - `G5-PMR-Final.docx` - Final report of project for DSCI 592.
 - `Folder /figures` - Contains all relevant figures created for the project
   - `Folder /FeatureMeansSummary` - Contains all summary figures for each letter
-  - `StandardDeviationOfAllClasses.png` - Composite image of standard deviations of each pixel mean value across each letter.  (See `ASLImageRecognition.ipynb` for more information.)
-  - `k_accuracy_plot.png` - Plot of K versus accuracy for KNN.
-  - `cnn_transfer_accuracy.png` - Plot of training and validation accuracy across epochs for CNN.
-  - `cnn_transfer_loss.png` - Plot of training and validation loss across epochs for CNN.
+     - `StandardDeviationOfAllClasses.png` - Composite image of standard deviations of each pixel mean value across each letter.  (See `ASLImageRecognition.ipynb` for more information.)
+  - `Folder /cnn` - Contains figures from CNN models.
+      - `cnn_transfer_accuracy.png` - Plot of training and validation accuracy across epochs for CNN.
+      - `cnn_transfer_loss.png` - Plot of training and validation loss across epochs for CNN.
+  - `Folder /knn` - Contains KNN confusion matrix for different values of k.
+      - `k_accuracy_plot.png` - Plot of K versus accuracy for KNN, done manually outside of project.
+
+
 - `Folder /CNN OUTPUT` - Contains performance outputs for CNN hyperparamater tuning.
 - `Folder /CNN TRANSFER OUTPUT` - Contains performance outputs for Transfer CNN.
 - `Folder /KNN OUTPUT` - Contains performance outputs for KNN.
