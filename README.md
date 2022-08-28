@@ -144,7 +144,7 @@ python .\step06_training.py KNN HyperTweak 3 5 10 15 20 30 40 50
 #NOTE: First kernel_size and stride values are used in the first convolutional layer, the second values are used in the second convolutional layer.
 python .\step06_training.py CNN
 
-#runs CNN with default values and outputs feature map visualizations, saved in figures/cnn_layers
+#runs CNN with default values and outputs feature map visualizations, saved in figures/cnn/cnn_layers
 python .\step06_training.py CNN VisLayers
 
 #runs CNN with hyperparameter loops.  Uses epochs=10, kernel_sizes=[[5,3],[4,4]], dropouts=[.2,.25], strides=[5,3] 
