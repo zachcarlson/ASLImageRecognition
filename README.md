@@ -87,8 +87,8 @@ Our team consisted of the following individuals (alphabetized by last name):
 
 **NOTE:** These instructions are for Windows.  You may need to modify the commands for Mac.
 
-1. Download repository.
-2. Download the videos stored [here](https://drive.google.com/drive/folders/1JfsDvx-Aq5ppHAef4y6wsKiAlfmYYm6V?usp=sharing).  We recommend downloading the zip of `Videos`, unzipping it, and adding it to the repository.  You can also create your own 30 second `.mp4` clips for each letter (excluding J and Z).  Regardless of what you decide, add these videos to the repository with the following file organization:
+1. **Download repository.**
+2. **Download the videos stored [here](https://drive.google.com/drive/folders/1JfsDvx-Aq5ppHAef4y6wsKiAlfmYYm6V?usp=sharing).**  We recommend downloading the zip of `Videos`, unzipping it, and adding it to the repository.  You can also create your own 30 second `.mp4` clips for each letter (excluding J and Z).  Regardless of what you decide, add these videos to the repository with the following file organization:
 ```
   /ASLImageRecognition
     /Videos
@@ -96,39 +96,39 @@ Our team consisted of the following individuals (alphabetized by last name):
       B.mp4
       ..
 ```
-3.  Open a terminal window in your preferred Python IDE, we recommend [Visual Studio Code](https://code.visualstudio.com/).  The current working directory should be `/ImageRecognition` for all following commands.
+3.  **Open a terminal window** in your preferred Python IDE, we recommend [Visual Studio Code](https://code.visualstudio.com/).  The current working directory should be `/ImageRecognition` for all following commands.
 
-4.  Running the following command will split the `.mp4` in `/Videos` into images.  They'll be saved in `uncropped_frames`:
+4.  **Split videos into images.** Running the following command will split the `.mp4` in `/Videos` into images.  They'll be saved in `uncropped_frames`:
 ```
 python .\step01_VideoSplitPreProcess.py
 ```
-5. Running the following command will crop the images from 1080x1920 pixels to 224x224 pixels.  These images will be saved in `cropped_frames`:
+5. **Crop images.** Running the following command will crop the images from 1080x1920 pixels to 224x224 pixels.  These images will be saved in `cropped_frames`:
 ```
 python .\step02_CropPreProcess.py
 ```
-6. Running the following command will convert the images to grayscale.  These images will be saved in `gray_frames`:
+6. **Convert images to grayscale.** Running the following command will convert the images to grayscale.  These images will be saved in `gray_frames`:
 ```
 python .\step03_GrayscalePreProcess.py
 ```
-7. Running the following command will import all images per class and save them into one single `.csv`.  These `.csv` files will be saved in `csv_files`.  *After `step04_CSVConversionPreProcess.py` has completed, you will have all necessary files to run the `ASLImageRecognition.ipynb` Notebook, if you wish.*
+7. **Convert images to `.csv`.** Running the following command will import all images per class and save them into one single `.csv`.  These `.csv` files will be saved in `csv_files`.  *After `step04_CSVConversionPreProcess.py` has completed, you will have all necessary files to run the `ASLImageRecognition.ipynb` Notebook, if you wish.*
 ```
 python .\step04_CSVConversionPreProcess.py
 ```
-8. Running the following command will produce the EDA figures for this project, which will be saved in `figures`:
+8. **Create EDA visualizations.** Running the following command will produce the EDA figures for this project, which will be saved in `figures`:
 ```
 python .\step05_EDA.py
 ```
-9. Running the following command will generate the required numpy files for KNN (and save these in `numpy_files`):
+9. **Create numpy files for KNN.** Running the following command will generate the required numpy files for KNN (and save these in `numpy_files`):
 ```
 #create numpy files for KNN
 python .\step06_training.py DimReduce
 ```
-10.  Running the following command will generate the required numpy files for CNN (and save these in `numpy_files`):
+10.  **Create numpy files for CNN.** Running the following command will generate the required numpy files for CNN (and save these in `numpy_files`):
 ```
 #create numpy files for CNN
 python .\step06_training.py csvToNpy
 ```
-11.  Now that the required numpy files are made, you can run the first two models.  There are several options for KNN to tune the value of K.  *If you want to run KNN on more than one K value you must include `HyperTweak` in your command.*  Some examples are below:
+11.  **Run KNN.** Now that the required numpy files are made, you can run the first two models.  There are several options for KNN to tune the value of K.  *If you want to run KNN on more than one K value you must include `HyperTweak` in your command.*  Some examples are below:
 ```
 #Run KNN with default K=10
 python .\step06_training.py KNN
@@ -137,10 +137,19 @@ python .\step06_training.py KNN
 python .\step06_training.py KNN HyperTweak 3 5 10 15 20 30 40 50
 
 ```
-12.  Use the following command to run CNN:
+12.  **Run CNN.** There are several optoins for CNN to tune various hyperparameters:
 
 ```
+#runs CNN with default values of epochs=10, kernel_size=[5,3], dropout=0.2, strides=[5,3] 
+#NOTE: First kernel_size and stride values are used in the first convolutional layer, the second values are used in the second convolutional layer.
 python .\step06_training.py CNN
+
+#runs CNN with default values and outputs feature map visualizations
+python .\step06_training.py CNN VisLayers
+
+#runs CNN with hyperparameter loops.  Uses epochs=10, kernel_sizes=[[5,3],[4,4]], dropouts=[.2,.25], strides=[5,3] 
+# NOTE: this command requires a lot of RAM memory.  Edit the parameter options on line 396 and 397 to reduce space required
+python .\step06_training.py CNN HPLoop
 ```
 13. Running the following command will run Transfer Learning CNN:
 ```
