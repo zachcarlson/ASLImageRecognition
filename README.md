@@ -72,11 +72,13 @@ Our team consisted of the following individuals (alphabetized by last name):
 - The following modules and packages are required:
   - `csv`
   - `cv2`
+  - `itertools`
   - `matplotlib`
   - `numpy`
   - `os`
   - `pandas`
   - `PIL.Image`, `PIL.ImageOps`
+  - `sklearn`
   - `sys`
   - `VGG16`
 
