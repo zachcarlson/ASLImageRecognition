@@ -239,7 +239,7 @@ def CNN_Transfer_Learn(num_epochs=4, haveUI = False):#original: 10 epochs
     if haveUI == False:
         matplotlib.use('Agg') # no UI backend
 
-    from tensorflow.keras.preprocessing.image import ImageDataGenerator
+    from keras.preprocessing.image import ImageDataGenerator
 
     train_path = 'split_images/train_images'
     valid_path = 'split_images/val_images'
@@ -253,8 +253,8 @@ def CNN_Transfer_Learn(num_epochs=4, haveUI = False):#original: 10 epochs
     test_set = datagen_test.flow_from_directory(test_path, target_size = (224, 224), batch_size = 32, class_mode = 'categorical',seed = 42, shuffle = True)#,subset='validation') #uncomment for minibatch
 
     print("Setting up VGG16 with custom final layer...")
-    from tensorflow.keras.applications.vgg16 import VGG16
-    from tensorflow.keras.models import Model
+    from keras.applications.vgg16 import VGG16
+    from keras.models import Model
     # Create a VGG16 model. Remove the last layer that was classifying, to be replaced with our own classifier layer.
     vgg = VGG16(input_shape=[224,244,3], weights='imagenet', include_top=False) #Training with Imagenet weights
     # Set layers as not trainable, maybe add boolean to toggle this.
