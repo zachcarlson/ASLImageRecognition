@@ -152,3 +152,4 @@ dmypy.json
 # Pyre type checker
 .pyre/
 /PMRSldies Upcoming models.mp4
+*.png
